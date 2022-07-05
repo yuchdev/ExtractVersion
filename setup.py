@@ -19,7 +19,7 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text(encoding='utf8')
 
 # Add possible dependencies here
-DEPENDENCIES = []
+DEPENDENCIES = ["pathlib"]
 
 setup(
     name=PACKAGE_NAME,
