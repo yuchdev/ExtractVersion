@@ -21,7 +21,7 @@ def is_linux():
 
 def is_macos():
     """
-    :return: True if system is MacOS, False otherwise
+    :return: True if system is macOS, False otherwise
     """
     return platform.system() == 'Darwin'
 
