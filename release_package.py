@@ -97,7 +97,7 @@ def upload_s3():
     Resulting URL would be:
     https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-0.9.5-py3-none-any.whl
     """
-    run(['aws', 's3', 'cp', wheel_path(), 's3://extract-version/packages/', '--acl public-read'])
+    run(['aws', 's3', 'cp', wheel_path(), 's3://extract-version/packages/', '--acl=public-read'])
 
 
 def tag_release():
