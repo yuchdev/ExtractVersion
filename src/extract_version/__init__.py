@@ -1,6 +1,4 @@
-import logging
 from pathlib import Path
-from cyberyozh_utils.path_utils import home_dir
 from .version import VERSION
 
 __version__ = VERSION
