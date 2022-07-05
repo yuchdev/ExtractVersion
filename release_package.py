@@ -87,7 +87,7 @@ def upload_s3():
     """
     Upload the package to S3
     Example:
-    aws s3 cp extract_version--2.9.31-py3-none-any.whl s3://extract-version-/server/
+    aws s3 cp extract_version--2.9.31-py3-none-any.whl s3://extract-version/server/
     aws s3api put-object-acl
         --bucket extract-version
         --key server/extract_version-2.9.31-py3-none-any.whl

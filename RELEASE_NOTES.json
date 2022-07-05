@@ -1,0 +1,18 @@
+{
+  "release": {
+    "download_link": "https://extract-version.s3.us-east-1.amazonaws.com/server/extract_version-{}-py3-none-any.whl"
+  },
+  "releases": {
+    "0.9.5": {
+      "release_notes": [
+        "Increment version to test repease_package.py --mode reinstall"
+      ]
+    },
+    "0.9.4": {
+      "release_notes": [
+        "First working version".
+        "Introducing release notes"
+      ]
+    }
+  }
+}
