@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
 import pathlib
-import platform
 from setuptools import find_packages, setup
+from src.extract_version.version import VERSION
 
 PACKAGE_NAME = "extract_version"
 PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__))))
-
-# Version of the module
-sys.path.append(os.path.abspath(os.path.join(PROJECT_DIR, "src", PACKAGE_NAME)))
-from version import VERSION
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent

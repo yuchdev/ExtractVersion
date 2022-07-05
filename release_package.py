@@ -5,11 +5,9 @@ import argparse
 import platform
 import json
 from subprocess import run
+from src.extract_version.version import VERSION
 
 PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__))))
-sys.path.append(os.path.abspath(os.path.join(PROJECT_DIR, "src", "extract_version")))
-from version import VERSION
-
 PYTHON = "python3"
 PIP = "pip3"
 
