@@ -85,19 +85,19 @@ def cleanup_old_wheels():
 
 def upload_s3():
     """
-    Upload the package to S3
+    Upload the package to S3.
     Example:
-    aws s3 cp extract_version--2.9.31-py3-none-any.whl s3://extract-version/server/
+    aws s3 cp extract_version--0.9.5-py3-none-any.whl s3://extract-version/packages/ --acl public-read
+    It is also possible to change existing ACL:
     aws s3api put-object-acl
         --bucket extract-version
-        --key server/extract_version-2.9.31-py3-none-any.whl
+        --key server/extract_version-0.9.5-py3-none-any.whl
         --acl public-read
+
+    Resulting URL would be:
+    https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-0.9.5-py3-none-any.whl
     """
-    run(['aws', 's3', 'cp', wheel_path(), 's3://extract-version/server/'])
-    run(['aws', 's3api', 'put-object-acl',
-         '--bucket', 'extract-version',
-         '--key', 'server/extract_version-{}-py3-none-any.whl'.format(VERSION),
-         '--acl', 'public-read'])
+    run(['aws', 's3', 'cp', wheel_path(), 's3://extract-version/packages/', '--acl public-read'])
 
 
 def tag_release():

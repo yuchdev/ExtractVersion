@@ -3,14 +3,19 @@
     "download_link": "https://extract-version.s3.us-east-1.amazonaws.com/server/extract_version-{}-py3-none-any.whl"
   },
   "releases": {
+    "0.9.6": {
+      "release_notes": [
+        "Increment version to test release_package.py --s3-upload --create-release"
+      ]
+    },
     "0.9.5": {
       "release_notes": [
-        "Increment version to test repease_package.py --mode reinstall"
+        "Increment version to test release_package.py --mode reinstall"
       ]
     },
     "0.9.4": {
       "release_notes": [
-        "First working version".
+        "First working version",
         "Introducing release notes"
       ]
     }
