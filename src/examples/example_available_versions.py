@@ -1,5 +1,6 @@
+import os
 import sys
-import asyncio
+from extract_version.extract_version import available_versions
 
 
 def main():
@@ -22,8 +23,10 @@ def main():
             }
         }
     }
-    all_versions = available_versions(versions_path=full_versions_path, pattern=data["pattern"])
-    print(all_versions)
+    for versions_path, data in test_version_dirs.items():
+        full_versions_path = os.path.join(current_dir, versions_path)
+        all_versions = available_versions(versions_path=full_versions_path, pattern=data["pattern"])
+        print(all_versions)
 
     return 0
 

@@ -39,13 +39,13 @@ def validate_version(version_string):
     return version_string if REG_V1.match(version_string) or REG_V2.match(version_string) else ""
 
 
-def sort_versions(versions_list):
+def sort_versions(versions_list, descending=False):
     """
     Accept list of versions looks like ['1.0.0', '1.0', '2']
     If minor version is missing, assume it is 0
     """
     assert isinstance(versions_list, list)
-    versions_list.sort(key=lambda x: [int(y) for y in x.split('.')])
+    versions_list.sort(key=lambda x: [int(y) for y in x.split('.')], reverse=descending)
     return versions_list
 
 
