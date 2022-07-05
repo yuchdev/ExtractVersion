@@ -4,7 +4,7 @@ from extract_version.extract_version import available_versions
 
 
 def main():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+    test_data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../test")
     test_version_dirs = {
         "test_data/versions/cellar": {
             "pattern": "(.*)",
@@ -24,7 +24,7 @@ def main():
         }
     }
     for versions_path, data in test_version_dirs.items():
-        full_versions_path = os.path.join(current_dir, versions_path)
+        full_versions_path = os.path.join(test_data_dir, versions_path)
         all_versions = available_versions(versions_path=full_versions_path, pattern=data["pattern"])
         print(all_versions)
 

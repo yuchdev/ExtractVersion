@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import pathlib
 from setuptools import find_packages, setup
-from src.extract_version.version import VERSION
 
+# Package-wide name
 PACKAGE_NAME = "extract_version"
+
+# Append package dir to sys.path
 PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__))))
+sys.path.append(os.path.abspath(os.path.join(PROJECT_DIR, "src", PACKAGE_NAME)))
+
+# noinspection PyUnresolvedReferences,PyPackageRequirements
+from version import VERSION
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
