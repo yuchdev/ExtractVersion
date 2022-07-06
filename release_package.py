@@ -70,6 +70,7 @@ def build_wheel():
     """
     run([PYTHON, '-m', 'pip', 'install', '--upgrade', 'pip'])
     run([PYTHON, '-m', 'pip', 'install', '--upgrade', 'build'])
+    run([PYTHON, '-m', 'pip', 'install', 'twine'])
     run([PYTHON, '-m', 'build'])
 
 
@@ -128,6 +129,7 @@ def create_release(release_file):
     run(['gh', 'release', 'create', 'release.{}'.format(VERSION), wheel_path(), targz_path(),
          '--title', '{}'.format(VERSION),
          '--notes-file', release_file])
+    run('twine', 'upload', 'dist/*')
 
 
 def tmp_release_notes(version):
