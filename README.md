@@ -1,5 +1,9 @@
 ## Extract Version
 
+![license](https://img.shields.io/github/license/yuchdev/ExtractVersion)
+![workflow](https://github.com/yuchdev/ExtractVersion/actions/workflows/python-app.yml/badge.svg)
+![issues](https://img.shields.io/github/issues/yuchdev/ExtractVersion)
+
 Python module for extracting version from the string or directory name
 
 The module offers following functionality:
