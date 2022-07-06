@@ -181,9 +181,6 @@ def main():
     else:
         print("Unknown mode")
 
-    if args.upload_s3:
-        upload_s3()
-
     if args.create_release:
         tmp_release_notes(VERSION)
         release_file = os.path.abspath('RELEASE.md')
@@ -197,6 +194,9 @@ def main():
             create_release(release_file=release_file)
 
         os.remove(release_file)
+
+    if args.upload_s3:
+        upload_s3()
 
     return 0
 
