@@ -9,6 +9,7 @@
         "Add inventory example"
       ]
     },
+    "1.0.1": {
       "release_notes": [
         "First release version",
         "Github Action CI set up",
