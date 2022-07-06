@@ -50,7 +50,7 @@ def wheel_path():
 
 def targz_path():
     """
-    :return: Path to the wheel file
+    :return: Path to the *.tar.gx archive
     """
     return os.path.join(PROJECT_DIR, 'dist', 'extract_version-{}.tar.gz'.format(VERSION))
 
