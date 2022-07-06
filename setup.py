@@ -23,6 +23,26 @@ README = (HERE / "README.md").read_text(encoding='utf8')
 # Add possible dependencies here
 DEPENDENCIES = ["pathlib"]
 
+# Github download link
+GITHUB_URL = "https://github.com/yuchdev/ExtractVersion"
+
+# Github download link
+GITHUB_DOWNLOAD = "{github_url}/releases/download/release.{version}/extract_version-{version}.tar.gz".format(
+    github_url=GITHUB_URL,
+    version=VERSION
+)
+
+# AWS download link
+AWS_DOWNLOAD = "https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-{}-py3-none-any.whl".format(
+    VERSION
+)
+
+# PyPI project page
+PYPI_URL = "https://pypi.org/project/extract-version/"
+
+# Issue tracker
+ISSUE_TRACKER = "{github_url}/issues".format(github_url=GITHUB_URL)
+
 setup(
     name=PACKAGE_NAME,
     version=VERSION,
@@ -31,9 +51,10 @@ setup(
     description="Python module for extracting version from the string or directory name",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/yuchdev/ExtractVersion",
+    url=GITHUB_URL,
+    download_url=GITHUB_DOWNLOAD,
     project_urls={
-        "Bug Tracker": "https://github.com/yuchdev/ExtractVersion/issues",
+        "Bug Tracker": ISSUE_TRACKER,
     },
     classifiers=[
         # How mature is this project? Common values are
@@ -49,7 +70,7 @@ setup(
         # that you indicate you support Python 3. These classifiers are *not*
         # checked by 'pip install'. See instead 'python_requires' below.
         "Programming Language :: Python :: 3",
-        "License :: Commercial",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
     packages=find_packages(where=str(HERE / 'src')),

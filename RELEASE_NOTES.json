@@ -3,10 +3,11 @@
     "download_link": "https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-{}-py3-none-any.whl"
   },
   "releases": {
-    "1.0.0": {
+    "1.0.1": {
       "release_notes": [
         "First release version",
-        "Github Action CI set up"
+        "Github Action CI set up",
+        "Fix license information"
       ]
     },
     "0.9.7": {
