@@ -13,7 +13,7 @@ The module offers following functionality:
 
 ### Examples:
 
-1. We fetch version `2020.1.0` from string `PyCharm-2020.1.0`, or version `1.0` from `my_program_v1.0`.
+1. We fetch version `2020.1.0` from string `PyCharm-2020.1.0`, or version `1.0` from `my_program_v1.0`
 
 * `AppVersion.Major.Minor` version format
 
