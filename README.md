@@ -47,7 +47,7 @@ extract_version(version_string='PyCharm-2018.1.2-windows-10.0', pattern='PyCharm
 > "2018.1.2"
 ```
 
-4. Create an inventory an inventory of installed versions of a particular application
+4. Create an inventory of installed versions of a particular application
 ```python
 application_path = "C:/Users/user/AppData/Local/JetBrains/PyCharm"
 pycharm_versions = available_versions(versions_path=application_path)
