@@ -3,7 +3,7 @@
     "download_link": "https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-{}-py3-none-any.whl"
   },
   "releases": {
-    "1.0.1": {
+    "1.1.0": {
       "release_notes": [
         "Rename the module",
         "Add inventory example"
