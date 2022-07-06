@@ -51,5 +51,5 @@ extract_version(version_string='PyCharm-2018.1.2-windows-10.0', pattern='PyCharm
 ```python
 application_path = "C:/Users/user/AppData/Local/JetBrains/PyCharm"
 pycharm_versions = available_versions(versions_path=application_path)
-> ["PyCharm-2018.1.2", "PyCharm-2018.2.0", "PyCharm-2020.1.0"]
+> {"2018.1.2": "PyCharm-2018.1.2", "2018.2.0": "PyCharm-2018.2.0", "2020.1.0": "PyCharm-2020.1.0"}
 ```
