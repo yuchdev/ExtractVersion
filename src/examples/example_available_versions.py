@@ -1,6 +1,6 @@
 import os
 import sys
-from extract_version.extract_version import available_versions
+from extract_version.version_info import available_versions
 
 
 def main():

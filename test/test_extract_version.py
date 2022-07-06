@@ -1,7 +1,7 @@
 import os
 import unittest
-from extract_version.extract_version import validate_version, extract_version, sort_versions
-from extract_version.extract_version import get_last_version, available_versions
+from extract_version.version_info import validate_version, extract_version, sort_versions
+from extract_version.version_info import get_last_version, available_versions
 
 
 class TestVersionPath(unittest.TestCase):
