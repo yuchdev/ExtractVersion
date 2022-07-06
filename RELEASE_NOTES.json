@@ -5,6 +5,11 @@
   "releases": {
     "1.0.1": {
       "release_notes": [
+        "Rename the module",
+        "Add inventory example"
+      ]
+    },
+      "release_notes": [
         "First release version",
         "Github Action CI set up",
         "Fix license information"
