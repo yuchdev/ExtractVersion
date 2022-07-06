@@ -1,8 +1,14 @@
 {
   "release": {
-    "download_link": "https://extract-version.s3.us-east-1.amazonaws.com/server/extract_version-{}-py3-none-any.whl"
+    "download_link": "https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-{}-py3-none-any.whl"
   },
   "releases": {
+    "1.0.0": {
+      "release_notes": [
+        "First release version",
+        "Github Action CI set up"
+      ]
+    },
     "0.9.7": {
       "release_notes": [
         "Possible to report release using command: release_package.py --mode reinstall --s3-upload --create-release"

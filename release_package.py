@@ -48,6 +48,13 @@ def wheel_path():
     return os.path.join(PROJECT_DIR, 'dist', 'extract_version-{}-py3-none-any.whl'.format(VERSION))
 
 
+def targz_path():
+    """
+    :return: Path to the wheel file
+    """
+    return os.path.join(PROJECT_DIR, 'dist', 'extract_version-{}.tar.gz'.format(VERSION))
+
+
 def uninstall_wheel():
     """
     pip.exe uninstall -y extract-version
@@ -98,6 +105,7 @@ def upload_s3():
     https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-0.9.5-py3-none-any.whl
     """
     run(['aws', 's3', 'cp', wheel_path(), 's3://extract-version/packages/', '--acl=public-read'])
+    run(['aws', 's3', 'cp', targz_path(), 's3://extract-version/packages/', '--acl=public-read'])
 
 
 def tag_release():
@@ -117,7 +125,7 @@ def create_release(release_file):
     Example:
     gh release create release.2.9.34 dist/extract_version-2.9.34-py3-none-any.whl --title 2.9.34 --notes-file RELEASE.md
     """
-    run(['gh', 'release', 'create', 'release.{}'.format(VERSION), wheel_path(),
+    run(['gh', 'release', 'create', 'release.{}'.format(VERSION), wheel_path(), targz_path(),
          '--title', '{}'.format(VERSION),
          '--notes-file', release_file])
 
