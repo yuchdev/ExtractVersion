@@ -53,3 +53,12 @@ application_path = "C:/Users/user/AppData/Local/JetBrains/PyCharm"
 pycharm_versions = available_versions(versions_path=application_path)
 > {"2018.1.2": "PyCharm-2018.1.2", "2018.2.0": "PyCharm-2018.2.0", "2020.1.0": "PyCharm-2020.1.0"}
 ```
+
+## Installation
+
+The package can be installed from pip
+```
+pip install extract-version
+```
+
+There are archives of previous releases available on [Github](https://github.com/yuchdev/ExtractVersion/releases) with the mirror on AWS
