@@ -13,6 +13,17 @@ The module offers the following functionality:
 * Validating version string
 * Sorting config and application directories that contain versions in its name
 
+### Installation
+
+The package can be installed from pip
+```
+pip install extract-version
+```
+
+There are archives of previous releases available on 
+[Github](https://github.com/yuchdev/ExtractVersion/releases) 
+with the mirror on [AWS](https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-1.1.0-py3-none-any.whl)
+
 ### Examples:
 
 1. We fetch version `2020.1.0` from string `PyCharm-2020.1.0`, or version `1.0` from `my_program_v1.0`
@@ -53,12 +64,3 @@ application_path = "C:/Users/user/AppData/Local/JetBrains/PyCharm"
 pycharm_versions = available_versions(versions_path=application_path)
 > {"2018.1.2": "PyCharm-2018.1.2", "2018.2.0": "PyCharm-2018.2.0", "2020.1.0": "PyCharm-2020.1.0"}
 ```
-
-## Installation
-
-The package can be installed from pip
-```
-pip install extract-version
-```
-
-There are archives of previous releases available on [Github](https://github.com/yuchdev/ExtractVersion/releases) with the mirror on AWS
