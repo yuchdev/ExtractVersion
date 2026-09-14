@@ -22,7 +22,7 @@ pip install extract-version
 
 There are archives of previous releases available on 
 [Github](https://github.com/yuchdev/ExtractVersion/releases) 
-with the mirror on [AWS](https://extract-version.s3.us-east-1.amazonaws.com/packages/extract_version-1.1.0-py3-none-any.whl)
+with the mirror on [AWS](https://packages-s3-useast1-any.s3.dualstack.us-east-1.amazonaws.com/extract-version/extract_version-1.2.0-py3-none-any.whl)
 
 ### Examples:
 

@@ -1,6 +1,31 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=77",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "extract_version"
+version = "1.2.0"
+description = "Python module for extracting version from the string or directory name"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "Yurii Cherkasov", email = "strategarius@protonmail.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/yuchdev/ExtractVersion"
+"Bug Tracker" = "https://github.com/yuchdev/ExtractVersion/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["extract_version*"]
