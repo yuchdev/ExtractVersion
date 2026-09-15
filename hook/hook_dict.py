@@ -1,7 +1,7 @@
-import os
-import sys
-import platform
 import getpass
+import os
+import platform
+import sys
 from pathlib import Path
 
 __doc__ = """Execute IDEA dictionaries synchronization.

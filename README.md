@@ -64,3 +64,30 @@ application_path = "C:/Users/user/AppData/Local/JetBrains/PyCharm"
 pycharm_versions = available_versions(versions_path=application_path)
 > {"2018.1.2": "PyCharm-2018.1.2", "2018.2.0": "PyCharm-2018.2.0", "2020.1.0": "PyCharm-2020.1.0"}
 ```
+
+### Command line
+
+Installing the package also provides an `extract-version` command (equivalently, `python -m extract_version`)
+exposing the same functionality from the shell. Every subcommand also reads its input from stdin when no
+arguments are given, so it composes with tools like `ls`/`find`.
+
+```
+extract-version extract "PyCharm-2020.1.0"
+> 2020.1.0
+
+extract-version extract "PyCharm-2018.1.2-windows-10.0" --pattern "PyCharm-(.*)-windows-10.0"
+> 2018.1.2
+
+extract-version sort 2018.1.2 2018.2.0 2020.1.0
+> 2018.1.2
+> 2018.2.0
+> 2020.1.0
+
+ls "C:/Users/user/AppData/Local/JetBrains/PyCharm" | extract-version last-version --pattern "PyCharm-(.*)"
+> PyCharm-2020.1.0
+
+extract-version available --path "C:/Users/user/AppData/Local/JetBrains/PyCharm" --json
+> {"2018.1.2": "PyCharm-2018.1.2", "2018.2.0": "PyCharm-2018.2.0", "2020.1.0": "PyCharm-2020.1.0"}
+```
+
+Run `extract-version --help` or `extract-version <subcommand> --help` for the full option list.

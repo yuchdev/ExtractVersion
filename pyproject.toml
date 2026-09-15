@@ -26,6 +26,15 @@ classifiers = [
 Homepage = "https://github.com/yuchdev/ExtractVersion"
 "Bug Tracker" = "https://github.com/yuchdev/ExtractVersion/issues"
 
+[project.scripts]
+extract-version = "extract_version.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["extract_version*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+]

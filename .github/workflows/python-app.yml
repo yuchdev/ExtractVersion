@@ -34,3 +34,4 @@ jobs:
       run: |
         python release_package.py --mode install
         python test/test_extract_version.py
+        python test/test_cli.py

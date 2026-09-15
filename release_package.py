@@ -4,8 +4,10 @@ import os
 import pathlib
 import sys
 import tomllib
+from abc import ABC, abstractmethod
 from functools import lru_cache
-from subprocess import run
+from subprocess import CalledProcessError, run
+from typing import Optional
 
 
 @lru_cache(maxsize=1)
@@ -67,6 +69,20 @@ def executable_exists(executable):
         return False
 
 
+def command_ok(cmd) -> bool:
+    """
+    Run a command purely as a live availability probe (e.g. "am I logged in",
+    "are credentials valid"), swallowing its output.
+
+    :param cmd: Command and arguments, as passed to subprocess.run
+    :return: True iff the command exists and exits with status 0
+    """
+    try:
+        return run(cmd, capture_output=True).returncode == 0
+    except FileNotFoundError:
+        return False
+
+
 def sanity_check(args):
     """
     Check if all required executables and configs are available
@@ -105,17 +121,6 @@ def uninstall_wheel():
     run([*PIP, "uninstall", "-y", PACKAGE_NAME_DASH], check=True)
 
 
-def publish_pypi():
-    """
-    Publish the package to PyPI
-    Example:
-    twine upload dist/{PACKAGE_NAME}-2.9.34-py3-none-any.whl
-    """
-    run([*PIP, "install", "--upgrade", "build", "twine"], check=True)
-    run(["twine", "check", "dist/*"], check=True)
-    run(["twine", "upload", "dist/*"], check=True)
-
-
 def build_wheel():
     """
     python.exe -m pip install --upgrade pip
@@ -149,48 +154,6 @@ def cleanup_old_wheels():
         for file in os.listdir(os.path.join(PROJECT_DIR, "dist")):
             if file.startswith(f"{PACKAGE_NAME}-"):
                 os.remove(os.path.join(PROJECT_DIR, "dist", file))
-
-
-def upload_s3():
-    """
-    Upload the package to S3
-    Example:
-    aws s3 cp {PACKAGE_NAME}-{VERSION}-py3-none-any.whl s3://{S3_BUCKET}/{PACKAGE_NAME_DASH}/ --acl public-read
-    """
-    run(["aws", "s3", "cp", wheel_path(), f"s3://{S3_BUCKET}/{PACKAGE_NAME_DASH}/", "--acl", "public-read"], check=True)
-
-
-def tag_release():
-    """
-    Tag the release on GitHub
-    Example:
-    git tag -a release.{VERSION} -m "Release {VERSION}"
-    git push origin --tags master
-    """
-    run(["git", "tag", "-a", f"release.{VERSION}", "-m", f"Release {VERSION}"], check=True)
-    run(["git", "push", "origin", "--tags", "master"], check=True)
-
-
-def create_release(release_file):
-    """
-    Create a release on GitHub
-    Example:
-    gh release create release.{VERSION} dist/{PACKAGE_NAME}-2.9.34-py3-none-any.whl --title {VERSION} --notes-file RELEASE.md
-    """
-    run(
-        [
-            "gh",
-            "release",
-            "create",
-            f"release.{VERSION}",
-            wheel_path(),
-            "--title",
-            VERSION,
-            "--notes-file",
-            release_file,
-        ],
-        check=True,
-    )
 
 
 def release_version_exists(version):
@@ -235,6 +198,221 @@ def tmp_release_notes():
     return os.path.abspath(release_md)
 
 
+def _log(message: str) -> None:
+    print(f"[release] {message}", file=sys.stderr)
+
+
+class ReleaseStep(ABC):
+    """
+    One stage of a release. Each concrete subclass owns both halves of one
+    reversible action: `execute()` performs it, `rollback()` compensates for
+    it, and `check()` is a live availability probe run immediately before
+    `execute()` (not just once up front) — override it only when the step has
+    a precondition to verify (a required CLI tool, valid credentials, being
+    logged in, ...).
+
+    `run_release_pipeline()` drives a list of steps as a Saga: if a step is
+    unavailable or its `execute()` fails, every step that already completed
+    is undone, in reverse order, via `rollback()` — and the failing step's
+    own (possibly partial) effect is undone the same way. Steps should be
+    ordered easiest-to-undo first and hardest-to-undo last, so that a late,
+    hard-to-reverse step never leaves an earlier, cheaper one stranded.
+    """
+
+    name: str = "release step"
+
+    def check(self) -> Optional[str]:
+        """Return None if this step is available to run, else a reason it isn't."""
+        return None
+
+    @abstractmethod
+    def execute(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def rollback(self) -> None:
+        raise NotImplementedError
+
+
+class UploadS3Step(ReleaseStep):
+    name = "upload wheel to S3"
+
+    def check(self) -> Optional[str]:
+        if not executable_exists("aws"):
+            return "awscli not installed"
+        if not command_ok(["aws", "sts", "get-caller-identity"]):
+            return "aws credentials are not configured or not valid (check `aws configure` / your profile)"
+        return None
+
+    def execute(self) -> None:
+        """
+        Example:
+        aws s3 cp {PACKAGE_NAME}-{VERSION}-py3-none-any.whl s3://{S3_BUCKET}/{PACKAGE_NAME_DASH}/ --acl public-read
+        """
+        run(
+            ["aws", "s3", "cp", wheel_path(), f"s3://{S3_BUCKET}/{PACKAGE_NAME_DASH}/", "--acl", "public-read"],
+            check=True,
+        )
+
+    def rollback(self) -> None:
+        """
+        Example:
+        aws s3 rm s3://{S3_BUCKET}/{PACKAGE_NAME_DASH}/{PACKAGE_NAME}-{VERSION}-py3-none-any.whl
+        """
+        key = f"{PACKAGE_NAME_DASH}/{os.path.basename(wheel_path())}"
+        run(["aws", "s3", "rm", f"s3://{S3_BUCKET}/{key}"], check=True)
+
+
+class GitTagStep(ReleaseStep):
+    name = "tag release in git"
+
+    def check(self) -> Optional[str]:
+        if not executable_exists("git"):
+            return "git not installed"
+        if not command_ok(["git", "remote", "get-url", "origin"]):
+            return "no 'origin' remote configured for this repository"
+        return None
+
+    def execute(self) -> None:
+        """
+        Example:
+        git tag -a release.{VERSION} -m "Release {VERSION}"
+        git push origin --tags master
+        """
+        run(["git", "tag", "-a", f"release.{VERSION}", "-m", f"Release {VERSION}"], check=True)
+        run(["git", "push", "origin", "--tags", "master"], check=True)
+
+    def rollback(self) -> None:
+        """
+        Example:
+        git tag -d release.{VERSION}
+        git push origin :refs/tags/release.{VERSION}
+        """
+        run(["git", "tag", "-d", f"release.{VERSION}"], check=True)
+        run(["git", "push", "origin", f":refs/tags/release.{VERSION}"], check=True)
+
+
+class GitHubReleaseStep(ReleaseStep):
+    name = "create GitHub release"
+
+    def check(self) -> Optional[str]:
+        if not executable_exists("gh"):
+            return "GitHub CLI (gh) not installed"
+        if not command_ok(["gh", "auth", "status"]):
+            return "gh is not logged in (run `gh auth login`)"
+        if not release_version_exists(VERSION):
+            return f"no release notes found for version {VERSION} in RELEASE_NOTES.json"
+        return None
+
+    def execute(self) -> None:
+        """
+        Example:
+        gh release create release.{VERSION} dist/{PACKAGE_NAME}-{VERSION}-py3-none-any.whl \\
+            --title {VERSION} --notes-file RELEASE.md
+        """
+        release_file = tmp_release_notes()
+        try:
+            run(
+                [
+                    "gh",
+                    "release",
+                    "create",
+                    f"release.{VERSION}",
+                    wheel_path(),
+                    "--title",
+                    VERSION,
+                    "--notes-file",
+                    release_file,
+                ],
+                check=True,
+            )
+        finally:
+            os.remove(release_file)
+
+    def rollback(self) -> None:
+        """
+        Example:
+        gh release delete release.{VERSION} --yes
+        """
+        run(["gh", "release", "delete", f"release.{VERSION}", "--yes"], check=True)
+
+
+class PublishPyPiStep(ReleaseStep):
+    name = "publish to PyPI"
+
+    def check(self) -> Optional[str]:
+        if not executable_exists("twine"):
+            return "twine not installed"
+        if not os.path.isfile(os.path.join(HOME, ".pypirc")):
+            return "no ~/.pypirc file found"
+        return None
+
+    def execute(self) -> None:
+        """
+        Example:
+        twine upload dist/{PACKAGE_NAME}-{VERSION}-py3-none-any.whl
+        """
+        run([*PIP, "install", "--upgrade", "build", "twine"], check=True)
+        run(["twine", "check", "dist/*"], check=True)
+        run(["twine", "upload", "dist/*"], check=True)
+
+    def rollback(self) -> None:
+        # PyPI has no delete/overwrite API for an already-uploaded release file; the only
+        # remedy is a manual "yank" from the web UI, so this can only warn, not undo.
+        _log(
+            f"WARNING: cannot auto-rollback a PyPI publish. If {PACKAGE_NAME}=={VERSION} was "
+            f"actually uploaded, yank it manually at "
+            f"https://pypi.org/manage/project/{PACKAGE_NAME_DASH}/release/{VERSION}/"
+        )
+
+
+def _rollback(steps: list[ReleaseStep]) -> None:
+    """
+    Best-effort compensation: run rollback() for each step in `steps`, in the
+    order given by the caller (already reverse-chronological), never letting
+    one failed rollback stop the rest.
+    """
+    for step in steps:
+        _log(f"Rolling back: {step.name}")
+        try:
+            step.rollback()
+        except Exception as exc:
+            _log(f"WARNING: rollback of '{step.name}' also failed ({exc}). Manual cleanup is required for this step.")
+
+
+def run_release_pipeline(steps: list[ReleaseStep]) -> None:
+    """
+    Execute release `steps` in order as a Saga with compensating transactions:
+    stop and roll back everything already completed (plus the failing step's
+    own partial effect) the moment a step is unavailable or raises.
+    """
+    completed: list[ReleaseStep] = []
+    for step in steps:
+        _log(f"Checking availability: {step.name}")
+        reason = step.check()
+        if reason is not None:
+            _log(f"ERROR: '{step.name}' is not available: {reason}")
+            _rollback(list(reversed(completed)))
+            sys.exit(1)
+
+        _log(f"Running: {step.name}")
+        try:
+            step.execute()
+        except CalledProcessError as exc:
+            _log(f"ERROR: '{step.name}' failed (command exited {exc.returncode}): {exc}")
+            _rollback([step, *reversed(completed)])
+            sys.exit(1)
+        except Exception as exc:
+            _log(f"ERROR: '{step.name}' failed: {exc}")
+            _rollback([step, *reversed(completed)])
+            sys.exit(1)
+        else:
+            _log(f"Completed: {step.name}")
+            completed.append(step)
+
+    _log(f"All {len(steps)} step(s) completed successfully")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Command-line params")
     parser.add_argument(
@@ -276,17 +454,19 @@ def main() -> int:
     else:
         print("Unknown mode")
 
-    if args.upload_s3 and args.mode != "uninstall":
-        upload_s3()
-
-    if args.create_release and args.mode != "uninstall":
-        release_file = tmp_release_notes()
-        tag_release()
-        create_release(release_file=release_file)
-        os.remove(release_file)
-
-    if args.publish_pypi and args.mode != "uninstall":
-        publish_pypi()
+    if args.mode != "uninstall":
+        # Ordered easiest-to-undo first, hardest-to-undo (PyPI) last, so a failure late in
+        # the pipeline never leaves a cheaper, already-reversible step stranded.
+        steps: list[ReleaseStep] = []
+        if args.upload_s3:
+            steps.append(UploadS3Step())
+        if args.create_release:
+            steps.append(GitTagStep())
+            steps.append(GitHubReleaseStep())
+        if args.publish_pypi:
+            steps.append(PublishPyPiStep())
+        if steps:
+            run_release_pipeline(steps)
 
     return 0
 

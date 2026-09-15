@@ -1,5 +1,6 @@
 import sys
-from extract_version.version_info import validate_version, extract_version
+
+from extract_version.version_info import extract_version, validate_version
 
 
 def main():

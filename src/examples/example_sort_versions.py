@@ -1,4 +1,5 @@
 import sys
+
 from extract_version.version_info import sort_versions
 
 

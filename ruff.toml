@@ -1,0 +1,42 @@
+src = ["src"]
+line-length = 120
+target-version = "py312"
+
+# tests/lint/lint_rules.py is a frozen behavioral oracle (see CLAUDE.md) that
+# tests/flake8_lint/test_plugin_parity_with_legacy.py diffs the new plugin
+# against; it must never be modified, including by autofix.
+#
+# tests/lint/assets/ and tests/flake8_lint/samples/ hold sample files that
+# deliberately contain the bad patterns each custom X-rule detects (bare
+# except, %-formatting, muted handlers, ...); ruff would "fix" away the very
+# violations those samples exist to trigger.
+extend-exclude = [
+    "tests/lint/lint_rules.py",
+    "tests/lint/assets",
+    "tests/flake8_lint/samples",
+]
+
+[lint]
+# Fix specific types of warnings with `ruff check --select SIM102 --fix .`
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+    "SIM102",
+    "SIM108",
+    "C4",
+    "UP017",
+    "UP037"
+]
+
+#   UP007 - Union[...] -> X | Y; Optional[X] -> X | None
+#   SIM300 - Yoda condition x == f(a, b)
+#   E402 - module level import not at top of file
+#   E501 - the line is too long
+ignore = [
+    "UP007",
+    "SIM300",
+    "E402",
+    "E501"
+]

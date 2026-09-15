@@ -1,5 +1,5 @@
-import re
 import os
+import re
 
 __doc__ = """The module offers following functionality:
 * Fetching version string from the string or name of the directory

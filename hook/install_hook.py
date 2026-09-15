@@ -1,8 +1,7 @@
 import os
-import sys
-import stat
 import platform
-
+import stat
+import sys
 
 PYTHON = "python3"
 HOOK_CONTENT = """#!/bin/sh

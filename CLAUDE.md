@@ -25,6 +25,15 @@ Run a single test:
 python -m unittest test.test_extract_version.TestVersionPath.test_sort_versions
 ```
 
+Run the CLI test suite:
+```
+python test/test_cli.py
+```
+
+Installing the package (editable or otherwise) also registers an `extract-version` console script (equivalently
+runnable as `python -m extract_version`), which exposes `extract`, `validate`, `sort`, `available`, and
+`last-version` subcommands mirroring the library functions below. Run `extract-version --help` for details.
+
 Lint (matches what CI runs):
 ```
 flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -68,12 +77,22 @@ entry is missing).
   - `available_versions` — maps `{version: original_dir_name}` for a list of names or a directory path.
   - `sort_versions` / `get_last_version` — sort by version tuple (`x.split('.')` cast to ints, so `"10" > "1.0.1"`
     numerically per-component); `get_last_version` composes `available_versions` + `sort_versions`.
+- **`src/extract_version/cli.py`** / **`src/extract_version/__main__.py`** — stdlib-`argparse`-only CLI (no new
+  dependencies), registered as the `extract-version` console script via `pyproject.toml`'s `[project.scripts]`.
+  Each subcommand (`extract`, `validate`, `sort`, `available`, `last-version`) is a thin 1:1 wrapper around the
+  matching function in `version_info.py`; commands that take a list of names fall back to reading
+  newline-separated entries from stdin when none are given positionally, so they compose in shell pipelines
+  (e.g. `ls <dir> | extract-version last-version --pattern '...'`). `--json` switches output from plain text to
+  `json.dumps`.
 - **`src/examples/`** — runnable scripts (`example_extract_versions.py`, `example_sort_versions.py`,
   `example_available_versions.py`) mirroring the usage examples in `README.md`; keep them in sync if the API
   changes. Not shipped in the built package (see `pyproject.toml` note above).
-- **`test/test_extract_version.py`** — the only test file, using stdlib `unittest`. `test_available_versions`
-  and `test_get_last_version` read real fixture directories under `test/test_data/versions/{cellar,pycharm}/`
-  rather than mocking the filesystem — add new fixture dirs there when testing directory-scanning behavior.
+- **`test/test_extract_version.py`** — tests the library functions, using stdlib `unittest`.
+  `test_available_versions` and `test_get_last_version` read real fixture directories under
+  `test/test_data/versions/{cellar,pycharm}/` rather than mocking the filesystem — add new fixture dirs there
+  when testing directory-scanning behavior.
+- **`test/test_cli.py`** — tests `cli.py` by calling `cli.main([...])` directly and capturing stdout/stderr
+  (no subprocess), reusing the same `test_data` fixture directories for the `available`/`last-version` cases.
 - **`hook/`** — unrelated developer tooling (an IDE spelling-dictionary merge pre-commit hook), not part of
   the published package.
 
