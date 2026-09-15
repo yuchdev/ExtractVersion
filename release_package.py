@@ -83,27 +83,14 @@ def command_ok(cmd) -> bool:
         return False
 
 
-def sanity_check(args):
+def sanity_check():
     """
-    Check if all required executables and configs are available
+    Check preconditions that aren't specific to any one release step (e.g. local package
+    layout). Each release step's own `check()` validates its own tools/credentials live,
+    right before it runs — see ReleaseStep and run_release_pipeline() below.
     """
     if not os.path.isdir(os.path.join(PROJECT_DIR, "src", PACKAGE_NAME)):
         print(f"Cannot find src/{PACKAGE_NAME}")
-        sys.exit(1)
-    if args.create_release and not release_version_exists(VERSION):
-        print(f"No release notes found for version {VERSION}")
-        sys.exit(1)
-    if args.upload_s3 and not executable_exists("aws"):
-        print("awscli not installed")
-        sys.exit(1)
-    if args.create_release and not executable_exists("gh"):
-        print("GitHub CLI not installed")
-        sys.exit(1)
-    if args.publish_pypi and not executable_exists("twine"):
-        print("twine not installed")
-        sys.exit(1)
-    if args.publish_pypi and not os.path.isfile(os.path.join(HOME, ".pypirc")):
-        print("No ~/.pypirc file found")
         sys.exit(1)
 
 
@@ -432,7 +419,7 @@ def main() -> int:
     print(f"Package name: {PACKAGE_NAME}")
     print(f"Package name2: {PACKAGE_NAME_DASH}")
     print(f"Version: {VERSION}")
-    sanity_check(args)
+    sanity_check()
 
     if args.mode == "build":
         build_wheel()
