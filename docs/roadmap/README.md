@@ -55,17 +55,12 @@ absolute-from-repo-root Markdown link:
 
 ## Milestones
 
-| #    | Milestone                                | Spec                                                                     | Status                                                                     |
-|------|-------------------------------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| 0001 | Generic, Cross-Platform Core              | [plan.md](/docs/roadmap/0001-generic-implementation/plan.md)              | [status.md](/docs/roadmap/0001-generic-implementation/status.md)          |
-| 0002 | Plugin API                                | [plan.md](/docs/roadmap/0002-plugin-api/plan.md)                          | [status.md](/docs/roadmap/0002-plugin-api/status.md)                      |
-| 0003 | Secure, CI-Native Publishing               | [plan.md](/docs/roadmap/0003-secure-ci-native-publishing/plan.md)         | [status.md](/docs/roadmap/0003-secure-ci-native-publishing/status.md)     |
-| 0004 | Release Intelligence & Public Launch      | [plan.md](/docs/roadmap/0004-release-intelligence-and-launch/plan.md)     | [status.md](/docs/roadmap/0004-release-intelligence-and-launch/status.md) |
+| #    | Milestone                            | Spec                                                                                     | Status                                                                                         |
+|------|--------------------------------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
+| 0001 | Version Parsing and Selection Hardening | [plan.md](/docs/roadmap/0001-version-parsing-hardening/plan.md)                          | [status.md](/docs/roadmap/0001-version-parsing-hardening/status.md)                            |
 
-> **Note:** `docs/roadmap/0001-working-implementation/` still exists on disk - it
-> is the illustrative template milestone this project's roadmap scaffold ships
-> with (see its `plan.md`: *"Replace this whole milestone... it exists to show
-> the shape, not to be extended"*). It has been superseded by the real `0001`
-> above and should be deleted; deletion was blocked by this repo's bash-guard
-> hook (`rm -rf` / `git rm -r` are both refused automatically), so remove it
-> manually: `git rm -r docs/roadmap/0001-working-implementation`.
+Milestone `0001` is the first real roadmap slice for this repository. It focuses on
+the package's core contract in [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+and the CLI wrapper in [`src/extract_version/cli.py`](/src/extract_version/cli.py), where
+version validation, extraction, selection, and user-facing error handling still need a
+clearer long-term implementation plan.
