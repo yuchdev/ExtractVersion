@@ -1,18 +1,20 @@
-# Subtask 02 - Output Format Rules
+# 02 - Output Format Rules
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`04.0-cli-contract-and-public-docs/README.md`](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/README.md)
+**State:** ⬜ Not started
+**Depends on:** 01
+**Blocks:** 03, 04
 
 ## Objective
 
 Define stable stdout formats for plain-text and `--json` output so CLI consumers
 are insulated from parser and inventory hardening changes.
 
-## Affected files
+## Files
 
-- [`src/extract_version/cli.py`](/src/extract_version/cli.py)
-- [`test/test_cli.py`](/test/test_cli.py)
-- [`README.md`](/README.md)
+- **Modify** [`src/extract_version/cli.py`](/src/extract_version/cli.py)
+- **Modify** [`test/test_cli.py`](/test/test_cli.py)
+- **Modify** [`README.md`](/README.md)
 
 ## Required behavior
 
@@ -34,5 +36,7 @@ are insulated from parser and inventory hardening changes.
 
 ## Success criteria
 
-- CLI output is specified as a contract, not inferred from `print()` behavior.
-- README examples, CLI tests, and actual command output all align on one format.
+- [ ] CLI output is specified as a contract, not inferred from `print()` behavior.
+- [ ] README examples, CLI tests, and actual command output all align on one
+      format.
+</content>

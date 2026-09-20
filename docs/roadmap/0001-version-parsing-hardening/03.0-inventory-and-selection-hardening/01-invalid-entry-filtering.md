@@ -1,17 +1,19 @@
-# Subtask 01 - Invalid-Entry Filtering
+# 01 - Invalid-Entry Filtering
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`03.0-inventory-and-selection-hardening/README.md`](/docs/roadmap/0001-version-parsing-hardening/03.0-inventory-and-selection-hardening/README.md)
+**State:** ⬜ Not started
+**Depends on:** Task 02.0
+**Blocks:** 02, 03
 
 ## Objective
 
 Define how `available_versions()` handles names that do not contain a valid
 version so the result map never exposes ambiguous empty keys by accident.
 
-## Affected files
+## Files
 
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
 
 ## Required behavior
 
@@ -34,5 +36,7 @@ version so the result map never exposes ambiguous empty keys by accident.
 
 ## Success criteria
 
-- `available_versions()` no longer leaks `""` keys into its public output.
-- Invalid-entry handling is documented once and reused by selection and CLI work.
+- [ ] `available_versions()` no longer leaks `""` keys into its public output.
+- [ ] Invalid-entry handling is documented once and reused by selection and CLI
+      work.
+</content>

@@ -1,17 +1,19 @@
-# Subtask 03 - Fixtures and Tests
+# 03 - Fixtures and Tests
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`03.0-inventory-and-selection-hardening/README.md`](/docs/roadmap/0001-version-parsing-hardening/03.0-inventory-and-selection-hardening/README.md)
+**State:** ⬜ Not started
+**Depends on:** 01, 02
+**Blocks:** -
 
 ## Objective
 
 Expand fixture-backed coverage so inventory and selection hardening is exercised
 against realistic directory inputs, not only synthetic lists.
 
-## Affected files
+## Files
 
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
-- `test/test_data/versions/`
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** `test/test_data/versions/`
 
 ## Required behavior
 
@@ -32,7 +34,8 @@ against realistic directory inputs, not only synthetic lists.
 
 ## Success criteria
 
-- Inventory behavior is validated against real directories, matching how the
-  package is used in practice.
-- Future regressions in invalid-entry filtering or duplicate handling can be
-  reproduced from stable fixture data.
+- [ ] Inventory behavior is validated against real directories, matching how the
+      package is used in practice.
+- [ ] Future regressions in invalid-entry filtering or duplicate handling can be
+      reproduced from stable fixture data.
+</content>

@@ -1,6 +1,9 @@
 # Task 01.0 - Version Contract and Parser Model
 
 **Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
+**Status:** ⬜ Not started
+
+## Scope
 
 This task defines the authoritative version grammar and normalization model for
 Extract Version. Its decisions govern
@@ -12,23 +15,24 @@ and the future expectations recorded in
 
 ## Subtasks
 
-| Subtask | Focus | Primary files |
-|---------|-------|---------------|
-| 01 | [Supported version shapes](/docs/roadmap/0001-version-parsing-hardening/01.0-version-contract-and-parser-model/01-supported-version-shapes.md) | `src/extract_version/version_info.py`, `README.md`, `test/test_extract_version.py` |
-| 02 | [Normalized sort key](/docs/roadmap/0001-version-parsing-hardening/01.0-version-contract-and-parser-model/02-normalized-sort-key.md) | `src/extract_version/version_info.py`, `test/test_extract_version.py` |
-| 03 | [Compatibility policy](/docs/roadmap/0001-version-parsing-hardening/01.0-version-contract-and-parser-model/03-compatibility-policy.md) | `README.md`, `src/extract_version/version_info.py`, `test/test_extract_version.py`, `test/test_cli.py` |
+| # | Document | Status | Blocks |
+|---|----------|--------|--------|
+| 01 | [Supported version shapes](01-supported-version-shapes.md) | ⬜ Not started | 02, 03 |
+| 02 | [Normalized sort key](02-normalized-sort-key.md) | ⬜ Not started | 03 |
+| 03 | [Compatibility policy](03-compatibility-policy.md) | ⬜ Not started | - |
 
-## Purpose
+Subtask 01 must land first - it defines the grammar the sort key and
+compatibility policy both build on. Subtask 03 depends on both 01 and 02.
 
-- Make the supported version grammar explicit instead of letting regex behavior
-  define it implicitly.
-- Decide how parsed versions are normalized for comparison and sorting.
-- Record which current behaviors remain supported and which should tighten in a
-  backward-compatible, documented way.
+## Key constraints
 
-## Target files
-
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
-- [`README.md`](/README.md)
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
-- [`test/test_cli.py`](/test/test_cli.py)
+- One canonical grammar and one normalized comparison model - every later
+  roadmap task references this task's decisions rather than inventing its own
+  parsing or sort rule (contract C1).
+- Backward-compatibility effects must be explicit (contract C2): a permissive
+  behavior kept for compatibility, and a stricter one, both need a documented
+  migration note rather than a silent change.
+- Touches: [`src/extract_version/version_info.py`](/src/extract_version/version_info.py),
+  [`README.md`](/README.md), [`test/test_extract_version.py`](/test/test_extract_version.py),
+  [`test/test_cli.py`](/test/test_cli.py).
+</content>

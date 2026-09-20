@@ -1,18 +1,20 @@
-# Subtask 03 - README and Examples
+# 03 - README and Examples
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`04.0-cli-contract-and-public-docs/README.md`](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/README.md)
+**State:** ⬜ Not started
+**Depends on:** 02
+**Blocks:** 04
 
 ## Objective
 
 Bring the public documentation and example scripts into line with the hardened
 parser and CLI contract.
 
-## Affected files
+## Files
 
-- [`README.md`](/README.md)
-- `src/examples/`
-- [`test/test_cli.py`](/test/test_cli.py)
+- **Modify** [`README.md`](/README.md)
+- **Modify** `src/examples/`
+- **Modify** [`test/test_cli.py`](/test/test_cli.py)
 
 ## Required behavior
 
@@ -33,6 +35,7 @@ parser and CLI contract.
 
 ## Success criteria
 
-- Public docs no longer contradict the real parser and CLI behavior.
-- README and examples can be used as reliable onboarding material for the
-  hardened contract.
+- [ ] Public docs no longer contradict the real parser and CLI behavior.
+- [ ] README and examples can be used as reliable onboarding material for the
+      hardened contract.
+</content>

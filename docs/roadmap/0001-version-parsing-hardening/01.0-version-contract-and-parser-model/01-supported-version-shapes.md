@@ -1,18 +1,20 @@
-# Subtask 01 - Supported Version Shapes
+# 01 - Supported Version Shapes
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`01.0-version-contract-and-parser-model/README.md`](/docs/roadmap/0001-version-parsing-hardening/01.0-version-contract-and-parser-model/README.md)
+**State:** ⬜ Not started
+**Depends on:** -
+**Blocks:** 02, 03
 
 ## Objective
 
 Define the supported version grammar for Extract Version so the public docs,
 library functions, and CLI commands stop relying on implicit regex behavior.
 
-## Affected files
+## Files
 
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
-- [`README.md`](/README.md)
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+- **Modify** [`README.md`](/README.md)
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
 
 ## Required behavior
 
@@ -38,6 +40,7 @@ library functions, and CLI commands stop relying on implicit regex behavior.
 
 ## Success criteria
 
-- There is one written grammar that every later roadmap subtask can reference.
-- The supported shapes in docs and tests match the eventual parser contract with
-  no contradiction between code comments and public examples.
+- [ ] There is one written grammar that every later roadmap subtask can reference.
+- [ ] The supported shapes in docs and tests match the eventual parser contract
+      with no contradiction between code comments and public examples.
+</content>

@@ -1,17 +1,19 @@
-# Subtask 03 - Pattern Capture Rules
+# 03 - Pattern Capture Rules
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`02.0-library-validation-and-extraction/README.md`](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/README.md)
+**State:** ⬜ Not started
+**Depends on:** 02
+**Blocks:** 04
 
 ## Objective
 
 Define how `pattern`-based extraction behaves so ambiguous strings and invalid
 regular-expression captures do not rely on undocumented assumptions.
 
-## Affected files
+## Files
 
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
 
 ## Required behavior
 
@@ -37,7 +39,8 @@ regular-expression captures do not rely on undocumented assumptions.
 
 ## Success criteria
 
-- Pattern-based extraction is precise, documented, and consistent with the
-  non-pattern parser.
-- Ambiguous multi-number strings no longer depend on whatever regex happens to
-  match first.
+- [ ] Pattern-based extraction is precise, documented, and consistent with the
+      non-pattern parser.
+- [ ] Ambiguous multi-number strings no longer depend on whatever regex happens
+      to match first.
+</content>
