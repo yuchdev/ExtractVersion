@@ -1,7 +1,7 @@
 # Task 03.0 - Inventory and Selection Hardening
 
 **Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
-**Status:** ⬜ Not started
+**Status:** ✅ Complete
 **Depends on:** Tasks 01.0, 02.0
 
 ## Scope
@@ -17,9 +17,9 @@ and the filesystem-backed expectations in
 
 | # | Document | Status | Blocks |
 |---|----------|--------|--------|
-| 01 | [Invalid-entry filtering](01-invalid-entry-filtering.md) | ⬜ Not started | 02, 03 |
-| 02 | [Last-version selection rules](02-last-version-selection-rules.md) | ⬜ Not started | 03 |
-| 03 | [Fixtures and tests](03-fixtures-and-tests.md) | ⬜ Not started | - |
+| 01 | [Invalid-entry filtering](01-invalid-entry-filtering.md) | ✅ Complete | 02, 03 |
+| 02 | [Last-version selection rules](02-last-version-selection-rules.md) | ✅ Complete | 03 |
+| 03 | [Fixtures and tests](03-fixtures-and-tests.md) | ✅ Complete | - |
 
 Subtask 01 depends on Task 02.0's shared parser. Subtask 02 depends on 01;
 subtask 03 depends on both 01 and 02.
