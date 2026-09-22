@@ -3,6 +3,22 @@
     "download_link": "https://packages-s3-useast1-any.s3.dualstack.us-east-1.amazonaws.com/{package_name_dash}/{package_name}-{version}-py3-none-any.whl"
   },
   "releases": {
+    "1.3.0": {
+      "release_notes": [
+        "Version grammar is now strictly X.Y or X.Y.Z (base-10 integer segments); a bare single integer like \"1\" is no longer treated as a version",
+        "validate_version() now requires an exact match: strings with trailing or leading garbage (\"1.0.0abc\", \"1.0beta\", \"v1.0\") are correctly rejected instead of matching on a valid-looking prefix",
+        "sort_versions() and get_last_version() now compare differing-length versions (\"1.0\" vs \"1.0.0\") as numerically equal and break ties deterministically by the version string itself, instead of depending on input or filesystem order",
+        "available_versions() no longer collapses every unparseable name onto a shared blank \"\" key; unparseable entries are filtered out of the result instead",
+        "get_last_version() now raises a clear, documented ValueError when no valid version is found or when neither versions_list nor versions_path is given, instead of an incidental IndexError/TypeError",
+        "extract_version(pattern=...) now has a fully documented error contract: a pattern with zero or more than one capture group raises PatternArityError, invalid regex syntax raises re.error, and everything else that fails to find a version returns \"\"",
+        "The CLI's exit-code contract is now explicit and documented: 0 for full success, 1 for a semantic or partial failure, 2 for missing/invalid input - visible in extract-version --help",
+        "extract/validate keep their partial-success behavior for multi-name calls (valid results still print, one stderr line per failure), now formally part of the documented contract",
+        "Fixed available's output (both plain-text and --json) to sort by the same numeric version-sort rule as the rest of the library, instead of lexicographically by string, so \"1.9\" now correctly precedes \"1.10\"",
+        "A bad --path on available/last-version (a nonexistent path, a file instead of a directory, or a permission error) now fails cleanly with a friendly message and exit code 1, instead of printing a raw Python traceback",
+        "README now documents the full grammar contract, a Compatibility Policy section, and the CLI's output-format and pattern-error contracts",
+        "Test suite significantly expanded: test/test_extract_version.py grew from 9 to 45 tests, test/test_cli.py from 17 to 60 tests"
+      ]
+    },
     "1.2.0": {
       "release_notes": [
         "Move S3 uploads to the shared packages-s3-useast1-any bucket, under an extract-version/ prefix",
