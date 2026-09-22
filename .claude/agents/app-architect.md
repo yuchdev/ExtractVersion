@@ -28,15 +28,17 @@ is shipped to users:
   `PACKAGE_ROOT` / `PROJECT_DIR` paths. The version lives only in `[project].version` of
   `pyproject.toml`; nothing else may duplicate it.
 
-**2. Release tooling (`release_package.py`).** An argparse CLI that is the project's *only*
-executable entry point. It reads `[project]` from `pyproject.toml` via stdlib `tomllib` (the
-reason for the `>=3.11` floor), derives `PACKAGE_NAME` / `PACKAGE_NAME_DASH` / `VERSION`, and
-shells out to three interchangeable distribution backends behind a common
-`sanity_check()` precondition gate: **PyPI** (`twine`, needs `~/.pypirc`), **GitHub releases**
-(`gh` + `git tag release.<VERSION>`), and **S3 mirror** (`aws s3 cp --acl public-read` into the
-shared `packages-s3-useast1-any` bucket under the `extract-version/` prefix). These are the
-closest thing this project has to a pluggable backend family; adding a fourth means a new
-`executable_exists` check in `sanity_check()` plus a new `--flag` branch in `main()`.
+**2. Release tooling (`release-saga`).** A separate PyPI package (installed console script,
+`pip install release-saga`), not a repo file — it replaced the former `release_package.py`. It
+reads `[project]` from `pyproject.toml` via stdlib `tomllib`, plus optional overrides from this
+repo's `[tool.release-saga]` table (`s3_bucket = "packages-s3-useast1-any"`,
+`git_tag_template = "release.{version}"`), derives the package name / dash-name / version, and
+shells out to three interchangeable distribution backends behind a common `sanity_check()`
+precondition gate: **PyPI** (`twine`, needs `~/.pypirc`), **GitHub releases** (`gh` + `git tag
+release.<VERSION>`), and **S3 mirror** (`aws s3 cp --acl public-read` into the shared
+`packages-s3-useast1-any` bucket under the `extract-version/` prefix). These backends live as
+`ReleaseStep` subclasses under `release_saga.steps.*` (`GitTagStep`, `GitHubReleaseStep`,
+`UploadS3Step`, `PublishPyPiStep`), sequenced by `release_saga.pipeline.run_release_pipeline()`.
 
 **3. Developer tooling (`hook/`) and examples (`src/examples/`).** `hook/install_hook.py`
 writes a `.git/hooks/pre-commit` shim that runs `hook/hook_dict.py` (an IDE
@@ -59,7 +61,7 @@ unparseable input - and it is also a valid dict key, so it silently collapses ev
 unparseable name in `available_versions` into one entry.
 
 **Entry points**: the library API is `from extract_version.version_info import ...` (`src/`
-layout, so never a `src.` prefix); the CLI is `python release_package.py --mode {build,install,
+layout, so never a `src.` prefix); the release CLI is `release-saga --mode {build,install,
 dev,reinstall,uninstall}` with optional `--upload-s3` / `--create-release` / `--publish-pypi`.
 `RELEASE_NOTES.json` (`releases.<VERSION>.release_notes` plus a `release.download_link`
 template) is an input contract of that CLI: `sanity_check()` refuses `--create-release` without

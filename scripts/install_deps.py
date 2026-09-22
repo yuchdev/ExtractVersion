@@ -1,5 +1,5 @@
 """
-Install/verify the external tools release_package.py needs, on macOS, Linux, or Windows:
+Install/verify the external tools release-saga needs, on macOS, Linux, or Windows:
 
 * awscli  - for --upload-s3
 * gh      - for --create-release

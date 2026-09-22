@@ -42,7 +42,7 @@ for point-in-time reviews.
 >   directory-name handling. No network, no credentials, no persistence, no dependencies
 >   beyond stdlib `re`/`os`. Boundary: whatever a calling program passes in as
 >   `version_string`, `pattern`, `versions_list`, or `versions_path`.
-> - **Release tooling** (`release_package.py`) - runs on a maintainer machine and in CI;
+> - **Release tooling** (`release-saga`) - runs on a maintainer machine and in CI;
 >   invokes `pip`, `build`, `twine`, `gh`, `git`, and `aws`. Boundary: local credentials and
 >   three public publication channels.
 > - **Developer hook** (`hook/install_hook.py`, `hook/hook_dict.py`) - not part of the wheel;
@@ -52,7 +52,7 @@ for point-in-time reviews.
 > ### 2. Assets
 >
 > - PyPI API token in `~/.pypirc`; `gh` CLI GitHub credentials; ambient AWS credentials used
->   by `aws s3 cp`. `release_package.py` only checks these exist (`sanity_check`) and never
+>   by `aws s3 cp`. `release-saga` only checks these exist (`sanity_check`) and never
 >   reads them - preserve that.
 > - Integrity of the published artifact: the wheel on PyPI, the GitHub release asset, and the
 >   S3 mirror object at `s3://packages-s3-useast1-any/extract-version/`.
@@ -84,7 +84,7 @@ for point-in-time reviews.
 >
 > ### 5. Mitigations
 >
-> Existing controls: `release_package.py` uses `run([...])` list-form subprocess calls
+> Existing controls: `release-saga` uses `run([...])` list-form subprocess calls
 > throughout (no `shell=True`); `sanity_check()` refuses to publish without the required
 > tooling, `~/.pypirc`, and a matching `RELEASE_NOTES.json` entry; the package has zero
 > third-party runtime dependencies, so its transitive attack surface is empty; CI tests the

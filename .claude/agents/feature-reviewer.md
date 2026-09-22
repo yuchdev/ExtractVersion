@@ -23,12 +23,12 @@ Establish what changed first: `git diff --stat` and `git diff` (or fetch the PR 
    `IndexError` on `match.group(1)`; (b) **filesystem directory listings** -
    `available_versions(versions_path=...)` does `os.listdir` on any path a caller hands it, so
    every directory name on disk is attacker-influenceable input that flows into the returned
-   dict; (c) **`RELEASE_NOTES.json`** - `release_package.py` parses it and interpolates
+   dict; (c) **`RELEASE_NOTES.json`** - `release-saga` parses it and interpolates
    `release.download_link` and the notes text into `RELEASE.md`, which becomes a published
    GitHub release body; (d) **environment variables and rglob'd file paths in `hook/`** -
    `hook_dict.py` builds `merge_command` by string-concatenating `PROJECTS`/`APPDATA`-derived
    paths and passes it to `os.system`, which is this repo's one genuine shell-injection
-   surface. Flag any new `os.system`/`shell=True` immediately; `release_package.py` correctly
+   surface. Flag any new `os.system`/`shell=True` immediately; `release-saga` correctly
    uses `run([...])` with list args and must stay that way. Missing auth/authorization checks on API routes. Any secret reaching a log, exception message, or store unredacted. Hard-coded credentials or endpoints.
 3. **Domain accuracy**: verify the change respects this project's core business invariants (ask `app-architect` if unsure what those are). The invariants that hold today, all in
    `src/extract_version/version_info.py`:

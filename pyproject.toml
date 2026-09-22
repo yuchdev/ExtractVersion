@@ -39,3 +39,7 @@ dev = [
     "pytest-cov>=7.1.0",
     "ruff>=0.16.7",
 ]
+
+[tool.release-saga]
+s3_bucket = "packages-s3-useast1-any"
+git_tag_template = "release.{version}"

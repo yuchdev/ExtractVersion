@@ -78,8 +78,8 @@ Treat stack traces and logs as potentially sensitive PII.
 
 Three project-specific categories beyond generic payloads:
 
-- **Publishing credentials handled by `release_package.py`.** `~/.pypirc` (PyPI token),
-  the `gh` CLI's GitHub auth, and ambient AWS credentials used by `aws s3 cp`. The script
+- **Publishing credentials handled by `release-saga`.** `~/.pypirc` (PyPI token),
+  the `gh` CLI's GitHub auth, and ambient AWS credentials used by `aws s3 cp`. The tool
   only ever *checks for existence* (`sanity_check`) and shells out - never read, echo, or
   pass these through Python, and never add a `--repository-url`/token argument that would
   land a secret in a process list or CI log.

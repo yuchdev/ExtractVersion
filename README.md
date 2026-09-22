@@ -111,8 +111,8 @@ doing:
 | Purpose            | Tools                              | Needed for                                   |
 |--------------------|-------------------------------------|-----------------------------------------------|
 | Running tests      | `pytest`, `pytest-cov`             | `test/test_extract_version.py`, `test/test_cli.py` |
-| Building the wheel | `setuptools`, `wheel`, `build`     | `release_package.py --mode build`             |
-| Publishing a release | `aws`, `gh`, `twine`              | `release_package.py --upload-s3` / `--create-release` / `--publish-pypi` (see [Releasing](#releasing)) |
+| Building the wheel | `release-saga`                     | `release-saga --mode build`                   |
+| Publishing a release | `aws`, `gh`, `twine`              | `release-saga --upload-s3` / `--create-release` / `--publish-pypi` (see [Releasing](#releasing)) |
 
 Requires Python >= 3.11.
 
@@ -262,8 +262,9 @@ pycharm_versions = available_versions(versions_path=application_path)
 
 ## Releasing
 
-`release_package.py` builds and installs the wheel locally, and can optionally publish it via
-`--upload-s3`, `--create-release` (GitHub), and `--publish-pypi`.
+`release-saga` builds and installs the wheel locally, and can optionally publish it via
+`--upload-s3`, `--create-release` (GitHub), and `--publish-pypi`. Install it first with
+`pip install release-saga` — it is a separate PyPI package, not bundled with this project.
 
 ### Release tool prerequisites
 
@@ -284,14 +285,14 @@ It does not set up credentials — do that with the commands in the table above.
 Run
 
 ```
-python release_package.py --mode build --create-release --upload-s3 --publish-pypi
+release-saga --mode build --create-release --upload-s3 --publish-pypi
 ```
 
 to perform the full release cycle.
 
 ### Rollback behavior
 
-If a tool or its credentials aren't ready when `release_package.py` reaches that step, the step
+If a tool or its credentials aren't ready when `release-saga` reaches that step, the step
 reports itself unavailable and the run rolls back every step already completed (deletes the S3
 object, the git tag, and/or the GitHub release, in that order) before exiting — see
-`ReleaseStep`/`run_release_pipeline()` in `release_package.py`.
+`ReleaseStep`/`run_release_pipeline()` in the `release-saga` package.

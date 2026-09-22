@@ -40,23 +40,25 @@ flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 ```
 
-Build/install/uninstall the wheel via the project's release helper (wraps `pip`/`build`):
+Build/install/uninstall the wheel via the `release-saga` console script (a separate PyPI package —
+`pip install release-saga` — that self-installs its own `build`/`twine` dependencies at runtime):
 ```
-python release_package.py --mode build        # build only
-python release_package.py --mode install       # build + install
-python release_package.py --mode dev           # build, then `pip install -e .`
-python release_package.py --mode reinstall     # uninstall + build + install (default)
-python release_package.py --mode uninstall
+release-saga --mode build        # build only
+release-saga --mode install       # build + install
+release-saga --mode dev           # build, then `pip install -e .`
+release-saga --mode reinstall     # uninstall + build + install (default)
+release-saga --mode uninstall
 ```
-`release_package.py` reads `name`/`version` from `pyproject.toml`'s `[project]` table (via stdlib `tomllib`,
-hence the `>=3.11` floor) — nothing about the package name is hardcoded in the script. It also drives releases
-end-to-end: `--create-release` tags the repo (`release.<VERSION>`) and creates a GitHub release (wheel only,
-via `gh`, requiring release notes for that version to exist first); `--publish-pypi` uploads to PyPI via
+`release-saga` reads `name`/`version` from `pyproject.toml`'s `[project]` table, plus optional overrides
+from the `[tool.release-saga]` table (this repo sets `s3_bucket = "packages-s3-useast1-any"` and
+`git_tag_template = "release.{version}"` there) — nothing about the package name is hardcoded. It also drives
+releases end-to-end: `--create-release` tags the repo (`release.<VERSION>`) and creates a GitHub release (wheel
+only, via `gh`, requiring release notes for that version to exist first); `--publish-pypi` uploads to PyPI via
 `twine` (requires `~/.pypirc`); `--upload-s3` mirrors the built wheel to the shared `packages-s3-useast1-any`
 S3 bucket, under a prefix named after the package (`extract-version/`). Bump `version` in `pyproject.toml`
 before cutting a release, and add a matching entry to `RELEASE_NOTES.json` under `releases.<VERSION>.release_notes`
-(used to generate `RELEASE.md` for the GitHub release body — `sanity_check()` refuses `--create-release` if that
-entry is missing).
+(used to generate `RELEASE.md` for the GitHub release body — `release-saga`'s `sanity_check()` refuses
+`--create-release` if that entry is missing).
 
 ## Architecture
 
@@ -101,8 +103,10 @@ entry is missing).
 - Package layout is `src/`-based (`[tool.setuptools.packages.find] where = ["src"]`), so imports in code and
   tests use `extract_version.version_info`, not a `src.` prefix.
 - Requires Python >= 3.11 (per `pyproject.toml`'s `requires-python`) — raised from the previous 3.8 floor
-  specifically so `release_package.py` can use stdlib `tomllib` to read `pyproject.toml` without an extra
-  dependency. `version_info.py` also uses the walrus operator (`:=`), which just needs 3.8+.
-- CI (`.github/workflows/python-app.yml`) runs on Python 3.11 via GitHub Actions on push/PR to `master`, and
-  builds+installs the package (`release_package.py --mode install`) before running tests against the
-  installed package rather than the source tree.
+  when the project's release tooling adopted stdlib `tomllib` to read `pyproject.toml` without an extra
+  dependency; the floor is now driven by this project's own packaging/tooling baseline (and `release-saga`
+  itself likewise needs 3.11+ for `tomllib`). `version_info.py` also uses the walrus operator (`:=`), which
+  just needs 3.8+.
+- CI (`.github/workflows/python-app.yml`) runs on Python 3.11 via GitHub Actions on push/PR to `master`,
+  installs `release-saga` alongside the other dev tools, and builds+installs the package
+  (`release-saga --mode install`) before running tests against the installed package rather than the source tree.
