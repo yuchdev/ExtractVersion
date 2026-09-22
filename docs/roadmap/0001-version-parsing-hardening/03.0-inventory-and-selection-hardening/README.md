@@ -17,9 +17,9 @@ and the filesystem-backed expectations in
 
 | # | Document | Status | Blocks |
 |---|----------|--------|--------|
-| 01 | [Invalid-entry filtering](01-invalid-entry-filtering.md) | ✅ Complete | 02, 03 |
-| 02 | [Last-version selection rules](02-last-version-selection-rules.md) | ✅ Complete | 03 |
-| 03 | [Fixtures and tests](03-fixtures-and-tests.md) | ✅ Complete | - |
+| 01 | [Invalid-entry filtering](/docs/roadmap/0001-version-parsing-hardening/03.0-inventory-and-selection-hardening/01-invalid-entry-filtering.md) | ✅ Complete | 02, 03 |
+| 02 | [Last-version selection rules](/docs/roadmap/0001-version-parsing-hardening/03.0-inventory-and-selection-hardening/02-last-version-selection-rules.md) | ✅ Complete | 03 |
+| 03 | [Fixtures and tests](/docs/roadmap/0001-version-parsing-hardening/03.0-inventory-and-selection-hardening/03-fixtures-and-tests.md) | ✅ Complete | - |
 
 Subtask 01 depends on Task 02.0's shared parser. Subtask 02 depends on 01;
 subtask 03 depends on both 01 and 02.

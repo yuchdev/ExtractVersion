@@ -16,10 +16,10 @@ should interact with version extraction.
 
 | # | Document | Status | Blocks |
 |---|----------|--------|--------|
-| 01 | [Exact `validate_version()`](01-exact-validate-version.md) | ✅ Complete | 02 |
-| 02 | [Shared parse helper](02-shared-parse-helper.md) | ✅ Complete | 03, 04 |
-| 03 | [Pattern capture rules](03-pattern-capture-rules.md) | ✅ Complete | 04 |
-| 04 | [Library tests](04-library-tests.md) | ✅ Complete | - |
+| 01 | [Exact `validate_version()`](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/01-exact-validate-version.md) | ✅ Complete | 02 |
+| 02 | [Shared parse helper](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/02-shared-parse-helper.md) | ✅ Complete | 03, 04 |
+| 03 | [Pattern capture rules](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/03-pattern-capture-rules.md) | ✅ Complete | 04 |
+| 04 | [Library tests](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/04-library-tests.md) | ✅ Complete | - |
 
 Subtask 01 depends on Task 01.0's grammar. Subtask 02 depends on 01; subtask
 03 depends on 02; subtask 04 depends on all of 01-03.

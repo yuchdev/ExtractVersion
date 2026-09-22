@@ -16,10 +16,10 @@ the public documentation that describes it. It covers
 
 | # | Document | Status | Blocks |
 |---|----------|--------|--------|
-| 01 | [CLI error contract](01-cli-error-contract.md) | ✅ Complete | 02, 04 |
-| 02 | [Output format rules](02-output-format-rules.md) | ✅ Complete | 03, 04 |
-| 03 | [README and examples](03-readme-and-examples.md) | ✅ Complete | 04 |
-| 04 | [CLI tests](04-cli-tests.md) | ✅ Complete | - |
+| 01 | [CLI error contract](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/01-cli-error-contract.md) | ✅ Complete | 02, 04 |
+| 02 | [Output format rules](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/02-output-format-rules.md) | ✅ Complete | 03, 04 |
+| 03 | [README and examples](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/03-readme-and-examples.md) | ✅ Complete | 04 |
+| 04 | [CLI tests](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/04-cli-tests.md) | ✅ Complete | - |
 
 Subtask 01 depends on Task 03.0's inventory contract. Subtask 02 depends on
 01; subtask 03 depends on 02; subtask 04 depends on all of 01-03.
