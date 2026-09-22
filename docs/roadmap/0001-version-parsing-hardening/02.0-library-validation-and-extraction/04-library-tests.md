@@ -1,17 +1,19 @@
-# Subtask 04 - Library Tests
+# 04 - Library Tests
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`02.0-library-validation-and-extraction/README.md`](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/README.md)
+**State:** ⬜ Not started
+**Depends on:** 01, 02, 03
+**Blocks:** -
 
 ## Objective
 
 Refresh the library test suite so the parser hardening work is locked down by
 behavioral coverage before and after implementation.
 
-## Affected files
+## Files
 
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
 
 ## Required behavior
 
@@ -35,7 +37,8 @@ behavioral coverage before and after implementation.
 
 ## Success criteria
 
-- `test/test_extract_version.py` becomes the authoritative regression suite for
-  parser behavior.
-- Future parser changes fail fast when they reintroduce prefix matching, sorting
-  drift, or inconsistent extraction rules.
+- [ ] `test/test_extract_version.py` becomes the authoritative regression suite
+      for parser behavior.
+- [ ] Future parser changes fail fast when they reintroduce prefix matching,
+      sorting drift, or inconsistent extraction rules.
+</content>

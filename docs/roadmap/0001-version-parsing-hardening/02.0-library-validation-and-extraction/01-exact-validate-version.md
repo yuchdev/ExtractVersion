@@ -1,17 +1,19 @@
-# Subtask 01 - Exact `validate_version()`
+# 01 - Exact `validate_version()`
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`02.0-library-validation-and-extraction/README.md`](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/README.md)
+**State:** ⬜ Not started
+**Depends on:** Task 01.0
+**Blocks:** 02
 
 ## Objective
 
 Make `validate_version()` enforce the exact parser contract instead of accepting
 strings that only begin with a valid-looking version.
 
-## Affected files
+## Files
 
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
 
 ## Required behavior
 
@@ -35,6 +37,7 @@ strings that only begin with a valid-looking version.
 
 ## Success criteria
 
-- `validate_version()` no longer accepts a valid prefix followed by junk.
-- The function's docstring, implementation, and tests all agree on “exact
-  version” semantics.
+- [ ] `validate_version()` no longer accepts a valid prefix followed by junk.
+- [ ] The function's docstring, implementation, and tests all agree on “exact
+      version” semantics.
+</content>

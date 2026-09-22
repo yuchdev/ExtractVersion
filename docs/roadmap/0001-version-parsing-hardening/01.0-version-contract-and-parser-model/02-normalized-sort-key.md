@@ -1,17 +1,19 @@
-# Subtask 02 - Normalized Sort Key
+# 02 - Normalized Sort Key
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`01.0-version-contract-and-parser-model/README.md`](/docs/roadmap/0001-version-parsing-hardening/01.0-version-contract-and-parser-model/README.md)
+**State:** ⬜ Not started
+**Depends on:** 01
+**Blocks:** 03
 
 ## Objective
 
 Define how parsed versions are normalized for comparison so sorting and “latest
 version” selection behave deterministically across all supported version shapes.
 
-## Affected files
+## Files
 
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
 
 ## Required behavior
 
@@ -37,6 +39,7 @@ version” selection behave deterministically across all supported version shape
 
 ## Success criteria
 
-- Sorting behavior is defined once and reused by both library and CLI specs.
-- Every later task can refer to one normalized comparison model instead of
-  inventing its own version ordering rule.
+- [ ] Sorting behavior is defined once and reused by both library and CLI specs.
+- [ ] Every later task can refer to one normalized comparison model instead of
+      inventing its own version ordering rule.
+</content>

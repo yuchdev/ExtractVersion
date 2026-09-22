@@ -1,17 +1,19 @@
-# Subtask 01 - CLI Error Contract
+# 01 - CLI Error Contract
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`04.0-cli-contract-and-public-docs/README.md`](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/README.md)
+**State:** ⬜ Not started
+**Depends on:** Task 03.0
+**Blocks:** 02, 04
 
 ## Objective
 
 Make the command-line interface's exit-code and stderr behavior explicit so users
 and tests can distinguish invalid input, missing input, and partial success.
 
-## Affected files
+## Files
 
-- [`src/extract_version/cli.py`](/src/extract_version/cli.py)
-- [`test/test_cli.py`](/test/test_cli.py)
+- **Modify** [`src/extract_version/cli.py`](/src/extract_version/cli.py)
+- **Modify** [`test/test_cli.py`](/test/test_cli.py)
 
 ## Required behavior
 
@@ -34,5 +36,6 @@ and tests can distinguish invalid input, missing input, and partial success.
 
 ## Success criteria
 
-- Every subcommand has a written, testable error contract.
-- CLI callers can rely on consistent exit codes and stderr routing.
+- [ ] Every subcommand has a written, testable error contract.
+- [ ] CLI callers can rely on consistent exit codes and stderr routing.
+</content>

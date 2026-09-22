@@ -1,17 +1,19 @@
-# Subtask 02 - Shared Parse Helper
+# 02 - Shared Parse Helper
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`02.0-library-validation-and-extraction/README.md`](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/README.md)
+**State:** ⬜ Not started
+**Depends on:** 01
+**Blocks:** 03, 04
 
 ## Objective
 
 Consolidate version parsing into one internal helper so validation, extraction,
 sorting, inventory, and selection stop drifting apart.
 
-## Affected files
+## Files
 
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
 
 ## Required behavior
 
@@ -35,7 +37,8 @@ sorting, inventory, and selection stop drifting apart.
 
 ## Success criteria
 
-- Parser logic exists in one internal place instead of being duplicated across
-  regex matches and ad hoc `split('.')` conversions.
-- Future changes to version grammar require updating one helper and its shared
-  tests rather than several loosely related functions.
+- [ ] Parser logic exists in one internal place instead of being duplicated
+      across regex matches and ad hoc `split('.')` conversions.
+- [ ] Future changes to version grammar require updating one helper and its
+      shared tests rather than several loosely related functions.
+</content>

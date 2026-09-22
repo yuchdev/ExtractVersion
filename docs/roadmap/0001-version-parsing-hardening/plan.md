@@ -22,6 +22,7 @@ not yet normalized across success and failure cases.
 - [Milestone scope and contracts](#milestone-scope-and-contracts)
 - [Dependency notes](#dependency-notes)
 - [Per-task specifications](#per-task-specifications)
+- [Dependency graph](#dependency-graph)
 
 ---
 
@@ -102,7 +103,96 @@ being left as incidental side effects of the library internals.
 
 ## Per-task specifications
 
-- [`01.0-version-contract-and-parser-model/README.md`](/docs/roadmap/0001-version-parsing-hardening/01.0-version-contract-and-parser-model/README.md)
-- [`02.0-library-validation-and-extraction/README.md`](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/README.md)
-- [`03.0-inventory-and-selection-hardening/README.md`](/docs/roadmap/0001-version-parsing-hardening/03.0-inventory-and-selection-hardening/README.md)
-- [`04.0-cli-contract-and-public-docs/README.md`](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/README.md)
+### Task 01.0 - Version Contract and Parser Model
+
+**Goal:** Define the authoritative version grammar and normalization model
+that every later task builds on.
+
+**Subtasks:** see [`01.0-version-contract-and-parser-model/README.md`](/docs/roadmap/0001-version-parsing-hardening/01.0-version-contract-and-parser-model/README.md)
+
+| # | Subtask | Summary |
+|---|---------|---------|
+| 01 | Supported version shapes | Canonical grammar for `X`, `X.Y`, `X.Y.Z`; leading-zero and match-precedence rules |
+| 02 | Normalized sort key | Canonical comparison key shared by sorting and last-version selection |
+| 03 | Compatibility policy | Which behaviors stay permissive vs. tighten, and where that must be documented |
+
+**Success criteria:** one written grammar and one normalized comparison model
+that Tasks 02.0-04.0 reference directly; no contradiction between code
+comments, tests, and public examples.
+
+---
+
+### Task 02.0 - Library Validation and Extraction
+
+**Goal:** Translate the version contract into implementable, testable
+behavior for the library API in
+[`src/extract_version/version_info.py`](/src/extract_version/version_info.py).
+
+**Subtasks:** see [`02.0-library-validation-and-extraction/README.md`](/docs/roadmap/0001-version-parsing-hardening/02.0-library-validation-and-extraction/README.md)
+
+| # | Subtask | Summary |
+|---|---------|---------|
+| 01 | Exact `validate_version()` | Whole-string validation reusing the canonical parser contract |
+| 02 | Shared parse helper | One internal parsing entry point reused by validation, extraction, sorting, and selection |
+| 03 | Pattern capture rules | Defined behavior for `pattern`-based extraction, no-match, and invalid-capture cases |
+| 04 | Library tests | Regression suite locking down exact validation, extraction, and sorting |
+
+**Success criteria:** `validate_version()`, `extract_version()`, and
+`sort_versions()` share one parser contract with no duplicated or drifting
+logic.
+
+---
+
+### Task 03.0 - Inventory and Selection Hardening
+
+**Goal:** Define deterministic behavior for inventory and last-version
+selection once invalid entries and duplicate normalized versions are possible
+inputs.
+
+**Subtasks:** see [`03.0-inventory-and-selection-hardening/README.md`](/docs/roadmap/0001-version-parsing-hardening/03.0-inventory-and-selection-hardening/README.md)
+
+| # | Subtask | Summary |
+|---|---------|---------|
+| 01 | Invalid-entry filtering | `available_versions()` never leaks `""` keys for versionless names |
+| 02 | Last-version selection rules | Deterministic `get_last_version()` outcome for every inventory state |
+| 03 | Fixtures and tests | Realistic fixture directories for mixed valid/invalid/duplicate inputs |
+
+**Success criteria:** `available_versions()` and `get_last_version()` behave
+predictably against fixture-backed directories, not just synthetic lists.
+
+---
+
+### Task 04.0 - CLI Contract and Public Docs
+
+**Goal:** Define the user-facing CLI contract and bring public docs into line
+with the hardened library behavior.
+
+**Subtasks:** see [`04.0-cli-contract-and-public-docs/README.md`](/docs/roadmap/0001-version-parsing-hardening/04.0-cli-contract-and-public-docs/README.md)
+
+| # | Subtask | Summary |
+|---|---------|---------|
+| 01 | CLI error contract | Exit-code and stderr contract for every subcommand |
+| 02 | Output format rules | Stable stdout shapes for plain-text and `--json` |
+| 03 | README and examples | Public docs and example scripts aligned with the hardened contract |
+| 04 | CLI tests | Regression suite for the user-facing contract, independent of library unit tests |
+
+**Success criteria:** CLI callers get consistent exit codes, stderr routing,
+and output shape; README and examples no longer contradict actual behavior.
+
+---
+
+## Dependency graph
+
+```
+Task 01.0 (Version Contract and Parser Model)
+   │
+   └──► Task 02.0 (Library Validation and Extraction)
+           │
+           └──► Task 03.0 (Inventory and Selection Hardening)
+                   │
+                   └──► Task 04.0 (CLI Contract and Public Docs)
+```
+
+This milestone has no parallel tracks - each task's contract is a
+precondition for the next. **Full milestone:** all four tasks, in order.
+</content>

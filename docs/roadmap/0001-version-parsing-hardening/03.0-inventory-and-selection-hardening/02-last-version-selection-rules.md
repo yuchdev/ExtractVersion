@@ -1,17 +1,19 @@
-# Subtask 02 - Last-Version Selection Rules
+# 02 - Last-Version Selection Rules
 
-**Parent milestone:** [`0001-version-parsing-hardening/plan.md`](/docs/roadmap/0001-version-parsing-hardening/plan.md)
 **Parent task:** [`03.0-inventory-and-selection-hardening/README.md`](/docs/roadmap/0001-version-parsing-hardening/03.0-inventory-and-selection-hardening/README.md)
+**State:** ⬜ Not started
+**Depends on:** 01
+**Blocks:** 03
 
 ## Objective
 
 Specify deterministic rules for `get_last_version()` once invalid entries and
 duplicate normalized versions are possible inputs.
 
-## Affected files
+## Files
 
-- [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
-- [`test/test_extract_version.py`](/test/test_extract_version.py)
+- **Modify** [`src/extract_version/version_info.py`](/src/extract_version/version_info.py)
+- **Modify** [`test/test_extract_version.py`](/test/test_extract_version.py)
 
 ## Required behavior
 
@@ -34,6 +36,7 @@ duplicate normalized versions are possible inputs.
 
 ## Success criteria
 
-- `get_last_version()` returns a documented result or failure mode for every
-  inventory state.
-- The newest-version choice is stable across repeated runs and input sources.
+- [ ] `get_last_version()` returns a documented result or failure mode for every
+      inventory state.
+- [ ] The newest-version choice is stable across repeated runs and input sources.
+</content>
