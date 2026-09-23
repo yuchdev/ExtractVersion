@@ -3,6 +3,17 @@
     "download_link": "https://packages-s3-useast1-any.s3.dualstack.us-east-1.amazonaws.com/{package_name_dash}/{package_name}-{version}-py3-none-any.whl"
   },
   "releases": {
+    "1.4.0": {
+      "release_notes": [
+        "Tooling-only release: no changes to the extract_version package itself (validate_version, extract_version, sort_versions, available_versions, get_last_version, and the extract-version CLI are all identical to 1.3.0)",
+        "Replaced the handwritten release_package.py script with the release-saga PyPI package (pip install release-saga) - a generalized, same-author reimplementation with an almost identical CLI (--mode build/install/dev/reinstall/uninstall, --upload-s3, --create-release, --publish-pypi) and the same Saga-style rollback pipeline",
+        "Added a [tool.release-saga] table to pyproject.toml to preserve this repo's existing release conventions that don't match release-saga's defaults: git_tag_template = \"release.{version}\" and s3_bucket = \"packages-s3-useast1-any\"",
+        "release-saga self-installs its own build/twine dependencies at runtime, so setuptools/wheel/build no longer need to be pre-installed separately to cut a release - only release-saga itself does",
+        "CI now installs release-saga and runs release-saga --mode install instead of python release_package.py --mode install",
+        "Updated README's Dependencies and Releasing sections, CLAUDE.md, and the repo's threat-model doc to reference release-saga instead of the removed script",
+        "RELEASE_NOTES.json's format and historical entries are unchanged"
+      ]
+    },
     "1.3.0": {
       "release_notes": [
         "Version grammar is now strictly X.Y or X.Y.Z (base-10 integer segments); a bare single integer like \"1\" is no longer treated as a version",
