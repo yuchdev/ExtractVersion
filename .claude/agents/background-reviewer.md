@@ -32,8 +32,8 @@ You are the **Background Reviewer** for Extract Version. You run independently o
      (`[int(y) for y in x.split('.')]`) and sorts the caller's list **in place** - watch for
      both the repeated parsing on large inputs and the surprise mutation of a caller's list.
    - `release-saga`'s `package_ops.build_wheel()` re-runs `pip install --upgrade pip` and
-     `pip install --upgrade build` on every call, so each `release-saga` run pays two network
-     round-trips before anything is built.
+     `pip install --upgrade build` on every call, so each `release-saga` run that builds a wheel
+     pays two network round-trips before anything is built.
 5. **License compatibility**: list the license of each direct dependency and flag any copyleft (GPL/AGPL) or unknown-license package that could conflict with the project's distribution model.
 
 ## Output
