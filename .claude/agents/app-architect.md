@@ -61,8 +61,9 @@ unparseable input - and it is also a valid dict key, so it silently collapses ev
 unparseable name in `available_versions` into one entry.
 
 **Entry points**: the library API is `from extract_version.version_info import ...` (`src/`
-layout, so never a `src.` prefix); the release CLI is `release-saga --mode {build,install,
-dev,reinstall,uninstall}` with optional `--upload-s3` / `--create-release` / `--publish-pypi`.
+layout, so never a `src.` prefix); the release CLI is `release-saga` (>= 1.2.0: always builds
+the wheel; no `--mode`) with optional `--local-install` / `--local-dev-mode` / `--upload-s3` /
+`--create-release` / `--publish-pypi`.
 `RELEASE_NOTES.json` (`releases.<VERSION>.release_notes` plus a `release.download_link`
 template) is an input contract of that CLI: `sanity_check()` refuses `--create-release` without
 a matching entry.

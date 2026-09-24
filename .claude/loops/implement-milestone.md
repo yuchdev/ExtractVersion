@@ -198,7 +198,7 @@ are cheap enough to run in full at every M5:
 1. `flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics` - the only
    hard-failing lint pass (syntax errors and undefined names). The second CI flake8
    invocation is `--exit-zero` and is advisory.
-2. `release-saga --mode install` - build the wheel and install it. CI tests the
+2. `release-saga --local-install` - build the wheel and install it. CI tests the
    *installed* package, not the source tree, so a packaging break (e.g. a
    `[tool.setuptools.packages.find]` change) fails here and nowhere else.
 3. `python test/test_extract_version.py` - the full suite (stdlib `unittest`, one file).
@@ -363,7 +363,7 @@ pass its own gates.
 This project's bar for "task complete" and "milestone complete" is the same one
 `implement-subtasks.md` defaults to - full suite green plus `/pr-review` LGTM - with the
 commands substituted for what this repo actually has: `flake8 . --select=E9,F63,F7,F82`,
-`release-saga --mode install`, and `python test/test_extract_version.py` (see
+`release-saga --local-install`, and `python test/test_extract_version.py` (see
 the exit-gate list under Phase R). There is no coverage threshold, no integration suite, and
 no deployment step to add on top; the only extra bar is the release preconditions in
 `sanity_check()` when a milestone actually cuts a release.

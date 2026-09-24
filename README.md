@@ -113,7 +113,7 @@ doing:
 | Purpose            | Tools                              | Needed for                                   |
 |--------------------|-------------------------------------|-----------------------------------------------|
 | Running tests      | `pytest`, `pytest-cov`             | `tests/{unit,integration,mock,e2e}/`         |
-| Building the wheel | `release-saga`                     | `release-saga --mode build`                   |
+| Building the wheel | `release-saga` (>= 1.2.0, < 2)     | `release-saga`                                |
 | Publishing a release | `aws`, `gh`, `twine`              | `release-saga --upload-s3` / `--create-release` / `--publish-pypi` (see [Releasing](#releasing)) |
 
 Requires Python >= 3.11.
@@ -264,9 +264,12 @@ pycharm_versions = available_versions(versions_path=application_path)
 
 ## Releasing
 
-`release-saga` builds and installs the wheel locally, and can optionally publish it via
-`--upload-s3`, `--create-release` (GitHub), and `--publish-pypi`. Install it first with
-`pip install release-saga` — it is a separate PyPI package, not bundled with this project.
+`release-saga` always builds the wheel first, can install it locally (`--local-install`, or
+`--local-dev-mode` for an editable install), and can optionally publish it via `--upload-s3`,
+`--create-release` (GitHub), and `--publish-pypi`. Install it first with
+`pip install "release-saga>=1.2.0,<2"` — it is a separate PyPI package, not bundled with this project
+(it is also listed in the `dev` dependency group in `pyproject.toml`). Version 1.2.0 removed the old
+`--mode` flag, so older `release-saga --mode ...` invocations no longer work.
 
 ### Release tool prerequisites
 
@@ -287,7 +290,7 @@ It does not set up credentials — do that with the commands in the table above.
 Run
 
 ```
-release-saga --mode build --create-release --upload-s3 --publish-pypi
+release-saga --create-release --upload-s3 --publish-pypi
 ```
 
 to perform the full release cycle.
