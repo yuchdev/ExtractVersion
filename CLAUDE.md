@@ -15,19 +15,22 @@ Install the package locally (editable, from `src/` layout):
 pip install -e .
 ```
 
-Run the full test suite (`unittest`, no pytest config present — CI invokes it directly):
+Run the full test suite with coverage (`pytest` + `pytest-cov`; CI invokes it the same way, gated on the 90%
+`fail_under` threshold in `.coveragerc`):
+```
+pytest --cov=extract_version --cov-report=term-missing
+```
+
+The suite is written against stdlib `unittest` (`TestCase` classes), so it also runs standalone without pytest:
 ```
 python test/test_extract_version.py
+python test/test_cli.py
+python test/test_package.py
 ```
 
 Run a single test:
 ```
 python -m unittest test.test_extract_version.TestVersionPath.test_sort_versions
-```
-
-Run the CLI test suite:
-```
-python test/test_cli.py
 ```
 
 Installing the package (editable or otherwise) also registers an `extract-version` console script (equivalently
@@ -95,6 +98,11 @@ before cutting a release, and add a matching entry to `RELEASE_NOTES.json` under
   when testing directory-scanning behavior.
 - **`test/test_cli.py`** — tests `cli.py` by calling `cli.main([...])` directly and capturing stdout/stderr
   (no subprocess), reusing the same `test_data` fixture directories for the `available`/`last-version` cases.
+- **`test/test_package.py`** — tests the package root: `extract_version/__init__.py`'s `__version__`
+  resolution (including the `importlib.metadata.PackageNotFoundError` fallback, exercised via
+  `importlib.reload` under a patched `version()`) and `extract_version/__main__.py`'s `python -m
+  extract_version` entry point (the only place in the suite that shells out via `subprocess`, since it's
+  checking the actual `__main__` dispatch).
 - **`hook/`** — unrelated developer tooling (an IDE spelling-dictionary merge pre-commit hook), not part of
   the published package.
 
@@ -110,3 +118,5 @@ before cutting a release, and add a matching entry to `RELEASE_NOTES.json` under
 - CI (`.github/workflows/python-app.yml`) runs on Python 3.11 via GitHub Actions on push/PR to `master`,
   installs `release-saga` alongside the other dev tools, and builds+installs the package
   (`release-saga --mode install`) before running tests against the installed package rather than the source tree.
+- CI runs the suite via `pytest --cov=extract_version --cov-report=term-missing`, which picks up `.coveragerc`
+  automatically; pytest-cov fails the build if coverage drops below the `fail_under = 90` threshold there.

@@ -15,6 +15,14 @@ class StdinPipe(io.StringIO):
         return False
 
 
+class StdinTty(io.StringIO):
+    """A StringIO that reports itself as a TTY, like an interactive terminal
+    with nothing piped in."""
+
+    def isatty(self):
+        return True
+
+
 def run_cli(argv):
     stdout, stderr = io.StringIO(), io.StringIO()
     with redirect_stdout(stdout), redirect_stderr(stderr):
@@ -57,6 +65,18 @@ class TestCliExtract(unittest.TestCase):
             exit_code, out, _ = run_cli(["extract"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(out, "2018.1.2\n1.0\n")
+
+    def test_extract_no_input_interactive_tty(self):
+        """
+        With no positional names and no piped stdin (an interactive TTY),
+        _read_names() takes its "nothing to read" branch rather than
+        blocking on stdin, so the CLI reports the same "no input given"
+        error as the empty-pipe case.
+        """
+        with mock.patch.object(cli.sys, "stdin", StdinTty("")):
+            exit_code, out, err = run_cli(["extract"])
+        self.assertEqual(exit_code, 2)
+        self.assertIn("no input given", err)
 
     def test_extract_pattern_no_capture_group_friendly_error(self):
         """A capture-group-less pattern exits nonzero with a friendly stderr, not a traceback."""
