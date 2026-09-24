@@ -1,5 +1,5 @@
 [run]
-source = extract_version
+source = src
 branch = True
 parallel = True
 omit =
