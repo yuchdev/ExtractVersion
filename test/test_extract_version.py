@@ -638,6 +638,73 @@ class TestVersionPath(unittest.TestCase):
         self.assertEqual(get_last_version(versions_list=["1.0", "1.0.0"]), "1.0.0")
         self.assertEqual(get_last_version(versions_list=["1.0.0", "1.0"]), "1.0.0")
 
+    def test_sort_versions_non_list_raises_assertion_error(self):
+        """
+        Test the second, structurally distinct failure mode of sort_versions
+        (the first being a non-numeric segment): the ``assert isinstance(...,
+        list)`` guard rejects a non-list argument (here a bare string, which is
+        iterable and would otherwise be silently sorted character-by-character)
+        with AssertionError rather than producing a nonsense per-character sort.
+        """
+        with self.assertRaises(AssertionError):
+            sort_versions("1.0")
+
+    def test_sort_versions_empty_segment_raises_value_error(self):
+        """
+        Test the boundary between a malformed-but-numeric-looking token and a
+        truly non-numeric one: a trailing-dot entry like "1." splits to an
+        EMPTY segment, so int("") raises ValueError inside _normalize_key. This
+        is a distinct failure path from the "1.x" alphabetic-segment case and
+        pins that sort_versions() does not silently treat "" as zero.
+        """
+        with self.assertRaises(ValueError):
+            sort_versions(["1.", "1.0"])
+
+    def test_extract_no_pattern_four_segment_matches_three_prefix(self):
+        """
+        Test the embedded-matching boundary for an over-long dotted run: with no
+        pattern, extract_version() reads "1.2.3" out of "1.2.3.4" (REG_V1's
+        three-segment match consumes the first three segments and stops), rather
+        than returning "" or the full four-segment string. Pins that a 4+ segment
+        input is treated as an embedded X.Y.Z, consistent with findall semantics,
+        even though validate_version() rejects the same string as a whole.
+        """
+        self.assertEqual(extract_version(version_string="1.2.3.4"), "1.2.3")
+        self.assertEqual(validate_version(version_string="1.2.3.4"), "")
+
+    def test_available_versions_pattern_arity_error_propagates(self):
+        """
+        Test that a malformed --pattern (zero capture groups) is not swallowed by
+        available_versions(): the PatternArityError raised inside extract_version
+        propagates out unchanged, which is exactly what the CLI's available/
+        last-version commands rely on to report a friendly pattern error instead
+        of silently returning an empty inventory.
+        """
+        with self.assertRaises(PatternArityError):
+            available_versions(versions_list=["PyCharm-2020.1.0"], pattern="PyCharm-.*")
+
+    def test_available_versions_bad_path_raises_oserror(self):
+        """
+        Test the filesystem failure mode at the library level: a nonexistent
+        versions_path lets os.listdir()'s FileNotFoundError (an OSError subclass)
+        propagate, rather than being masked into an empty dict. This is the raw
+        error the CLI later catches and reformats into a friendly message.
+        """
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        missing_path = os.path.join(current_dir, "test_data/versions/no-such-dir-xyz")
+        with self.assertRaises(OSError):
+            available_versions(versions_path=missing_path)
+
+    def test_get_last_version_pattern_arity_error_propagates(self):
+        """
+        Test that get_last_version() also lets a PatternArityError from a
+        malformed --pattern propagate (a distinct failure from the "no valid
+        version found" ValueError), so the CLI can distinguish a pattern-usage
+        error from an empty inventory in its except clauses.
+        """
+        with self.assertRaises(PatternArityError):
+            get_last_version(versions_list=["PyCharm-2020.1.0"], pattern="PyCharm-.*")
+
 
 if __name__ == "__main__":
     unittest.main()

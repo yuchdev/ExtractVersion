@@ -106,6 +106,29 @@ class TestCliExtract(unittest.TestCase):
         self.assertEqual(out, "2018.1.2\n")
         self.assertIn("NoVersionHere", err)
 
+    def test_extract_json_single_name_is_one_element_array(self):
+        """
+        Second happy-path case for extract's --json shape: a single name still
+        serializes as a one-element JSON array (the list branch of _print), not
+        a bare scalar, so downstream consumers can parse extract --json uniformly
+        regardless of how many names were passed.
+        """
+        exit_code, out, _ = run_cli(["extract", "PyCharm-2018.1.2-linux", "--json"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(json.loads(out), ["2018.1.2"])
+
+    def test_extract_json_partial_failure_only_successes_on_stdout(self):
+        """
+        extract --json keeps the two streams separate on a mixed batch: only the
+        extractable name's version lands in the stdout JSON array while the
+        unextractable name is reported solely on stderr (no error placeholder in
+        the array), exit 1. Mirrors the validate --json partial-failure guarantee.
+        """
+        exit_code, out, err = run_cli(["extract", "PyCharm-2018.1.2-linux", "NoVersionHere", "--json"])
+        self.assertEqual(exit_code, 1)
+        self.assertEqual(json.loads(out), ["2018.1.2"])
+        self.assertIn("NoVersionHere", err)
+
     def test_extract_multi_name_pattern_error_short_circuits(self):
         """
         In a multi-name batch, a pattern error on any name short-circuits the
@@ -125,6 +148,16 @@ class TestCliValidate(unittest.TestCase):
         exit_code, out, _ = run_cli(["validate", "0.87", "1.00"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(out, "0.87\n1.00\n")
+
+    def test_validate_single_valid_plain(self):
+        """
+        Second plain-text happy-path case for validate: a lone valid version
+        echoes itself on one stdout line with exit 0, confirming the success
+        path does not depend on multiple names being present.
+        """
+        exit_code, out, _ = run_cli(["validate", "2018.1.2"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(out, "2018.1.2\n")
 
     def test_validate_invalid(self):
         exit_code, out, err = run_cli(["validate", "NoVersion"])
@@ -189,6 +222,16 @@ class TestCliValidate(unittest.TestCase):
         self.assertEqual(json.loads(out), ["1.0"])
         self.assertIn("NoVersion", err)
 
+    def test_validate_json_single_valid_is_one_element_array(self):
+        """
+        Second happy-path case for validate's --json shape: one valid name still
+        serializes as a single-element JSON array, not a scalar, so validate
+        --json output has a stable array shape independent of name count.
+        """
+        exit_code, out, _ = run_cli(["validate", "2018.1.2", "--json"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(json.loads(out), ["2018.1.2"])
+
     def test_validate_two_invalid_names_emit_exactly_one_stderr_line_each(self):
         """
         The documented "one stderr line per failed name" fan-out is pinned by
@@ -216,6 +259,49 @@ class TestCliSort(unittest.TestCase):
         exit_code, out, _ = run_cli(["sort", "1.0", "2.0", "1.5", "--descending", "--json"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(json.loads(out), ["2.0", "1.5", "1.0"])
+
+    def test_sort_ascending_json(self):
+        """
+        Second happy-path case for sort's --json shape (the existing one is
+        descending): ascending --json serializes the numeric-sorted versions as
+        a JSON array in ascending order, matching the plain-text line order.
+        """
+        exit_code, out, _ = run_cli(["sort", "20", "1.0", "1.0.2", "1.0.1", "10", "--json"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(json.loads(out), ["1.0", "1.0.1", "1.0.2", "10", "20"])
+
+    def test_sort_descending_plain(self):
+        """
+        Second happy-path case for the --descending flag (the existing one is
+        --json): in plain text, --descending emits the versions newest-first,
+        one per line, confirming the flag drives ordering independent of --json.
+        """
+        exit_code, out, _ = run_cli(["sort", "1.0", "2.0", "1.5", "--descending"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(out, "2.0\n1.5\n1.0\n")
+
+    def test_sort_numeric_not_lexicographic_order(self):
+        """
+        Edge case pinning sort's OWN numeric-vs-lexicographic contract (the
+        divergence tests elsewhere only exercise it through `available`): with
+        multi-digit segments where string order and numeric order disagree,
+        "1.9" must precede "1.10" and "2.0" must precede "10.0".
+        """
+        exit_code, out, _ = run_cli(["sort", "1.10", "1.9", "10.0", "2.0"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(out, "1.9\n1.10\n2.0\n10.0\n")
+
+    def test_sort_json_invalid_entry_empty_stdout(self):
+        """
+        Second failure case for sort: even with --json requested, a single
+        unparseable entry fails the whole sort all-or-nothing -- exit 1, EMPTY
+        stdout (no empty JSON array is emitted), and the reason on stderr.
+        """
+        exit_code, out, err = run_cli(["sort", "1.0", "NoVersion", "--json"])
+        self.assertEqual(exit_code, 1)
+        self.assertEqual(out, "")
+        self.assertIn("NoVersion", err)
+        self.assertNotIn("Traceback", err)
 
     def test_sort_from_stdin(self):
         with mock.patch.object(cli.sys, "stdin", StdinPipe("1.0.2\n1.0\n1.0.1\n")):
@@ -315,6 +401,22 @@ class TestCliDirectoryCommands(unittest.TestCase):
     def test_available_with_names_and_pattern(self):
         names = os.listdir(self.pycharm_dir)
         exit_code, out, _ = run_cli(["available", *names, "--pattern", "PyCharm(.*)", "--json"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(
+            json.loads(out),
+            {"2020.3": "PyCharm2020.3", "2021.1": "PyCharm2021.1", "2020.1": "PyCharm2020.1"},
+        )
+
+    def test_available_from_stdin(self):
+        """
+        available's stdin fallback (via _read_names / _versions_source when no
+        --path and no positional NAMEs) builds the inventory from piped names,
+        mirroring last-version's stdin path. Without this, available's non-path,
+        non-positional success branch was never exercised.
+        """
+        names = os.listdir(self.pycharm_dir)
+        with mock.patch.object(cli.sys, "stdin", StdinPipe("\n".join(names) + "\n")):
+            exit_code, out, _ = run_cli(["available", "--pattern", "PyCharm(.*)", "--json"])
         self.assertEqual(exit_code, 0)
         self.assertEqual(
             json.loads(out),
@@ -596,6 +698,37 @@ class TestCliDirectoryCommands(unittest.TestCase):
         self.assertEqual(out, "")
         self.assertIn("extract-version last-version:", err)
         self.assertNotIn("Traceback", err)
+
+
+class TestCliReadNames(unittest.TestCase):
+    """
+    Directly pin _read_names' stdin-parsing edge behavior, which the happy-path
+    stdin tests exercise only incidentally.
+    """
+
+    def test_stdin_strips_whitespace_and_drops_blank_lines(self):
+        """
+        _read_names strips surrounding whitespace from each piped line and drops
+        blank/whitespace-only lines, so ragged stdin (indented names, empty
+        lines, a trailing newline) still yields exactly the intended names in
+        order. Piped through `extract` end-to-end to assert the observable result.
+        """
+        piped = "  1.0  \n\n\t\nmy_program_v2.0\n   \n"
+        with mock.patch.object(cli.sys, "stdin", StdinPipe(piped)):
+            exit_code, out, _ = run_cli(["extract"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(out, "1.0\n2.0\n")
+
+    def test_positional_names_take_precedence_over_piped_stdin(self):
+        """
+        When positional NAMEs are given, _read_names returns them and never
+        consults stdin, so piped content is ignored entirely (guards the
+        `if names:` early return against a regression that merged both sources).
+        """
+        with mock.patch.object(cli.sys, "stdin", StdinPipe("PyCharm-9.9.9\n")):
+            exit_code, out, _ = run_cli(["extract", "my_program_v1.0"])
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(out, "1.0\n")
 
 
 class TestCliArgparseErrors(unittest.TestCase):
