@@ -3,6 +3,8 @@
 ![license](https://img.shields.io/github/license/yuchdev/ExtractVersion)
 ![workflow](https://github.com/yuchdev/ExtractVersion/actions/workflows/python-app.yml/badge.svg)
 ![issues](https://img.shields.io/github/issues/yuchdev/ExtractVersion)
+![python](https://img.shields.io/badge/python-3.11%2B-blue)
+![coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)
 
 Python module for extracting version from the string or directory name. Could make use for creating an
 inventory of installed versions of a particular application or finding the latest installed version.
