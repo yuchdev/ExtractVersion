@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov release-saga
+        pip install flake8 pytest pytest-cov "release-saga>=1.2.0,<2"
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
@@ -32,5 +32,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Run test
       run: |
-        release-saga --mode install
+        release-saga --local-install
         pytest --cov=extract_version --cov-report=term-missing

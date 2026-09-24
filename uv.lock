@@ -139,6 +139,7 @@ source = { editable = "." }
 dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
+    { name = "release-saga" },
     { name = "ruff" },
 ]
 
@@ -148,6 +149,7 @@ dev = [
 dev = [
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
+    { name = "release-saga", specifier = ">=1.2.0,<2" },
     { name = "ruff", specifier = ">=0.16.7" },
 ]
 
@@ -215,6 +217,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b1/51/a849f96e117386044471c8ec2bd6cfebacda285da9525c9106aeb28da671/pytest_cov-7.1.0.tar.gz", hash = "sha256:30674f2b5f6351aa09702a9c8c364f6a01c27aae0c1366ae8016160d1efc56b2", size = 55592, upload-time = "2026-03-21T20:11:16.284Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9d/7a/d968e294073affff457b041c2be9868a40c1c71f4a35fcc1e45e5493067b/pytest_cov-7.1.0-py3-none-any.whl", hash = "sha256:a0461110b7865f9a271aa1b51e516c9a95de9d696734a2f71e3e78f46e1d4678", size = 22876, upload-time = "2026-03-21T20:11:14.438Z" },
+]
+
+[[package]]
+name = "release-saga"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5e/83/9ab9c7fe9f80d488fd8b95ed286be29c5cb42e3b721f6aed68438bb4f909/release_saga-1.2.0.tar.gz", hash = "sha256:41997aa2a8828ae3f38f00898103e9ddfe154477e0256f07b610aa897b333181", size = 49168, upload-time = "2026-09-24T11:08:17.027Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0c/7f/abfa786dd707a7814252eba15acb13d5ab6fcf5d89e2aa229e5e8dbbdaa4/release_saga-1.2.0-py3-none-any.whl", hash = "sha256:56ddd95be6587a20097379b9d32111578057e5ac8f53f46232413f5f989b3e07", size = 33817, upload-time = "2026-09-24T11:08:13.846Z" },
 ]
 
 [[package]]

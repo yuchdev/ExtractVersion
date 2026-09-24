@@ -43,14 +43,18 @@ flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 ```
 
-Build/install/uninstall the wheel via the `release-saga` console script (a separate PyPI package —
-`pip install release-saga` — that self-installs its own `build`/`twine` dependencies at runtime):
+Build/install the wheel via the `release-saga` console script (a separate PyPI package, pinned to
+`release-saga>=1.2.0,<2` in `pyproject.toml`'s `dev` dependency group and in CI — that self-installs its own
+`build`/`twine` dependencies at runtime). 1.2.0 removed `--mode`: the wheel build always runs first, and
+installing is an opt-in pipeline step:
 ```
-release-saga --mode build        # build only
-release-saga --mode install       # build + install
-release-saga --mode dev           # build, then `pip install -e .`
-release-saga --mode reinstall     # uninstall + build + install (default)
-release-saga --mode uninstall
+release-saga                      # build only
+release-saga --local-install      # build + install/upgrade the wheel (uninstalled again if a later step fails)
+release-saga --local-dev-mode     # build, then `pip install -e .` (implies --local-install; kept regardless)
+pip uninstall extract_version     # uninstall (no release-saga equivalent any more)
+release-saga --version            # print [project].version and exit
+release-saga --set-version X.Y.Z  # bump pyproject.toml + RELEASE_NOTES.json and exit
+release-saga --clean              # roll back the latest interrupted release run and exit
 ```
 `release-saga` reads `name`/`version` from `pyproject.toml`'s `[project]` table, plus optional overrides
 from the `[tool.release-saga]` table (this repo sets `s3_bucket = "packages-s3-useast1-any"` and
@@ -128,6 +132,6 @@ before cutting a release, and add a matching entry to `RELEASE_NOTES.json` under
   just needs 3.8+.
 - CI (`.github/workflows/python-app.yml`) runs on Python 3.11 via GitHub Actions on push/PR to `master`,
   installs `release-saga` alongside the other dev tools, and builds+installs the package
-  (`release-saga --mode install`) before running tests against the installed package rather than the source tree.
+  (`release-saga --local-install`) before running tests against the installed package rather than the source tree.
 - CI runs the suite via `pytest --cov=extract_version --cov-report=term-missing`, which picks up `.coveragerc`
   automatically; pytest-cov fails the build if coverage drops below the `fail_under = 90` threshold there.
