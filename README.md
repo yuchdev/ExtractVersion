@@ -110,7 +110,7 @@ doing:
 
 | Purpose            | Tools                              | Needed for                                   |
 |--------------------|-------------------------------------|-----------------------------------------------|
-| Running tests      | `pytest`, `pytest-cov`             | `test/test_extract_version.py`, `test/test_cli.py` |
+| Running tests      | `pytest`, `pytest-cov`             | `tests/{unit,integration,mock,e2e}/`         |
 | Building the wheel | `release-saga`                     | `release-saga --mode build`                   |
 | Publishing a release | `aws`, `gh`, `twine`              | `release-saga --upload-s3` / `--create-release` / `--publish-pypi` (see [Releasing](#releasing)) |
 

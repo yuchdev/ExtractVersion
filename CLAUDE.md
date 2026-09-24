@@ -21,16 +21,16 @@ Run the full test suite with coverage (`pytest` + `pytest-cov`; CI invokes it th
 pytest --cov=extract_version --cov-report=term-missing
 ```
 
-The suite is written against stdlib `unittest` (`TestCase` classes), so it also runs standalone without pytest:
+The suite is written against stdlib `unittest` (`TestCase` classes), so each file also runs standalone without
+pytest, e.g.:
 ```
-python test/test_extract_version.py
-python test/test_cli.py
-python test/test_package.py
+python tests/unit/test_version_info.py
+python tests/e2e/test_cli.py
 ```
 
 Run a single test:
 ```
-python -m unittest test.test_extract_version.TestVersionPath.test_sort_versions
+python -m unittest tests.unit.test_version_info.TestVersionInfoUnit.test_sort_versions
 ```
 
 Installing the package (editable or otherwise) also registers an `extract-version` console script (equivalently
@@ -92,17 +92,28 @@ before cutting a release, and add a matching entry to `RELEASE_NOTES.json` under
 - **`src/examples/`** — runnable scripts (`example_extract_versions.py`, `example_sort_versions.py`,
   `example_available_versions.py`) mirroring the usage examples in `README.md`; keep them in sync if the API
   changes. Not shipped in the built package (see `pyproject.toml` note above).
-- **`test/test_extract_version.py`** — tests the library functions, using stdlib `unittest`.
-  `test_available_versions` and `test_get_last_version` read real fixture directories under
-  `test/test_data/versions/{cellar,pycharm}/` rather than mocking the filesystem — add new fixture dirs there
-  when testing directory-scanning behavior.
-- **`test/test_cli.py`** — tests `cli.py` by calling `cli.main([...])` directly and capturing stdout/stderr
-  (no subprocess), reusing the same `test_data` fixture directories for the `available`/`last-version` cases.
-- **`test/test_package.py`** — tests the package root: `extract_version/__init__.py`'s `__version__`
-  resolution (including the `importlib.metadata.PackageNotFoundError` fallback, exercised via
-  `importlib.reload` under a patched `version()`) and `extract_version/__main__.py`'s `python -m
-  extract_version` entry point (the only place in the suite that shells out via `subprocess`, since it's
-  checking the actual `__main__` dispatch).
+- **`tests/`** — organized first by test type, then by the component under test within each type directory
+  (`test_version_info.py`, `test_cli.py`, `test_package.py`, matching `src/extract_version/`'s modules). Every
+  subdirectory is a package (`__init__.py`) so pytest can tell same-named files (e.g. three `test_cli.py`s)
+  apart without an import-path collision. A test's bucket is decided by technique, not by which function it
+  calls:
+  - **`tests/unit/`** — a single public function, in-memory inputs only (no real filesystem, no CLI, no
+    `unittest.mock`).
+  - **`tests/integration/`** — multiple internal components collaborating in-memory: either cross-function
+    library consistency checks (`extract_version`/`validate_version`/`sort_versions` agreeing with each
+    other), or the CLI end-to-end (`cli.main()` → argparse → `version_info.py` → output formatting) via
+    plain positional args, still with no real fixture directories and no mocking.
+  - **`tests/mock/`** — anything using `unittest.mock`: stdin patched as a pipe or a TTY (`StdinPipe`/
+    `StdinTty` in `tests/mock/test_cli.py`) to drive the CLI's stdin-fallback paths, and
+    `importlib.metadata.version` patched to exercise `__init__.py`'s `PackageNotFoundError` fallback.
+  - **`tests/e2e/`** — real, checked-in fixture directories under `tests/test_data/versions/{cellar,pycharm,
+    mixed,filtered,all-invalid,duplicates}/` (`available_versions`/`get_last_version` via `versions_path=` or
+    the CLI's `--path`) plus the one test that shells out via `subprocess` to exercise `python -m
+    extract_version` for real. Add new fixture dirs under `tests/test_data/versions/` when testing new
+    directory-scanning behavior; every e2e file reaches them via `../test_data` since it lives one directory
+    below the old flat `tests/`.
+- **`tests/test_data/`** — shared fixture directories consumed by `tests/e2e/` (and, for the piped-names
+  case, `tests/mock/test_cli.py`).
 - **`hook/`** — unrelated developer tooling (an IDE spelling-dictionary merge pre-commit hook), not part of
   the published package.
 

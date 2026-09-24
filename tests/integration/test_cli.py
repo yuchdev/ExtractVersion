@@ -1,26 +1,9 @@
 import io
 import json
-import os
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
-from unittest import mock
 
 from extract_version import cli
-
-
-class StdinPipe(io.StringIO):
-    """A StringIO that reports itself as piped (not a TTY), like a real pipe."""
-
-    def isatty(self):
-        return False
-
-
-class StdinTty(io.StringIO):
-    """A StringIO that reports itself as a TTY, like an interactive terminal
-    with nothing piped in."""
-
-    def isatty(self):
-        return True
 
 
 def run_cli(argv):
@@ -53,30 +36,6 @@ class TestCliExtract(unittest.TestCase):
         self.assertEqual(exit_code, 1)
         self.assertEqual(out, "")
         self.assertIn("NoVersionHere", err)
-
-    def test_extract_no_input(self):
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("")):
-            exit_code, out, err = run_cli(["extract"])
-        self.assertEqual(exit_code, 2)
-        self.assertIn("no input given", err)
-
-    def test_extract_from_stdin(self):
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("PyCharm-2018.1.2\nmy_program_v1.0\n")):
-            exit_code, out, _ = run_cli(["extract"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "2018.1.2\n1.0\n")
-
-    def test_extract_no_input_interactive_tty(self):
-        """
-        With no positional names and no piped stdin (an interactive TTY),
-        _read_names() takes its "nothing to read" branch rather than
-        blocking on stdin, so the CLI reports the same "no input given"
-        error as the empty-pipe case.
-        """
-        with mock.patch.object(cli.sys, "stdin", StdinTty("")):
-            exit_code, out, err = run_cli(["extract"])
-        self.assertEqual(exit_code, 2)
-        self.assertIn("no input given", err)
 
     def test_extract_pattern_no_capture_group_friendly_error(self):
         """A capture-group-less pattern exits nonzero with a friendly stderr, not a traceback."""
@@ -177,16 +136,6 @@ class TestCliValidate(unittest.TestCase):
         self.assertEqual(out, "")
         for name in near_misses:
             self.assertIn(name, err)
-
-    def test_validate_no_input(self):
-        """
-        Empty piped input reports no input (exit 2), matching every other
-        subcommand's no-input branch, rather than silently succeeding.
-        """
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("")):
-            exit_code, out, err = run_cli(["validate"])
-        self.assertEqual(exit_code, 2)
-        self.assertIn("no input given", err)
 
     def test_validate_mixed_valid_and_invalid_partial_failure(self):
         """
@@ -303,12 +252,6 @@ class TestCliSort(unittest.TestCase):
         self.assertIn("NoVersion", err)
         self.assertNotIn("Traceback", err)
 
-    def test_sort_from_stdin(self):
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("1.0.2\n1.0\n1.0.1\n")):
-            exit_code, out, _ = run_cli(["sort"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "1.0\n1.0.1\n1.0.2\n")
-
     def test_sort_invalid_entry_semantic_failure(self):
         """
         A single unparseable entry fails the whole sort (all-or-nothing, per
@@ -322,45 +265,13 @@ class TestCliSort(unittest.TestCase):
         self.assertIn("NoVersion", err)
         self.assertNotIn("Traceback", err)
 
-    def test_sort_no_input(self):
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("")):
-            exit_code, out, err = run_cli(["sort"])
-        self.assertEqual(exit_code, 2)
-        self.assertIn("no input given", err)
 
-
-class TestCliDirectoryCommands(unittest.TestCase):
-    def setUp(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        versions_root = os.path.join(current_dir, "test_data/versions")
-        self.cellar_dir = os.path.join(versions_root, "cellar")
-        self.pycharm_dir = os.path.join(versions_root, "pycharm")
-        self.mixed_dir = os.path.join(versions_root, "mixed")
-        self.all_invalid_dir = os.path.join(versions_root, "all-invalid")
-        self.filtered_dir = os.path.join(versions_root, "filtered")
-        self.duplicates_dir = os.path.join(versions_root, "duplicates")
-        # A --path that does not exist (FileNotFoundError) and one that points at
-        # an existing file rather than a directory (NotADirectoryError); both
-        # surface from os.listdir() as OSError subclasses.
-        self.nonexistent_dir = os.path.join(versions_root, "no-such-directory-xyz")
-        self.not_a_directory = os.path.join(current_dir, "test_cli.py")
-
-    def test_available_with_path(self):
-        exit_code, out, _ = run_cli(["available", "--path", self.cellar_dir, "--json"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(json.loads(out), {"0.01": "0.01", "1.0": "1.0", "0.87": "0.87"})
-
-    def test_available_with_path_plain_text(self):
-        """
-        Without --json, available prints one tab-separated "version\\tname" line
-        per entry, ordered by the numeric version-sort contract in _print. Pins the
-        exact plain-text layout, which every other available test skips via --json.
-        (Here numeric and lexicographic order coincide; the multi-digit ordering
-        tests below cover the case where they diverge.)
-        """
-        exit_code, out, _ = run_cli(["available", "--path", self.cellar_dir])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "0.01\t0.01\n0.87\t0.87\n1.0\t1.0\n")
+class TestCliAvailableLastVersionPositional(unittest.TestCase):
+    """
+    available/last-version tests that use only positional NAMEs or inline patterns -- no
+    --path fixture directory, no mocked stdin. The --path/real-directory cases live in
+    e2e/test_cli.py; the stdin-fallback cases live in mock/test_cli.py.
+    """
 
     def test_available_plain_text_numeric_not_lexicographic_order(self):
         """
@@ -398,84 +309,6 @@ class TestCliDirectoryCommands(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         self.assertEqual(list(json.loads(out).keys()), ["1.9", "1.10", "2.0", "10.0"])
 
-    def test_available_with_names_and_pattern(self):
-        names = os.listdir(self.pycharm_dir)
-        exit_code, out, _ = run_cli(["available", *names, "--pattern", "PyCharm(.*)", "--json"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(
-            json.loads(out),
-            {"2020.3": "PyCharm2020.3", "2021.1": "PyCharm2021.1", "2020.1": "PyCharm2020.1"},
-        )
-
-    def test_available_from_stdin(self):
-        """
-        available's stdin fallback (via _read_names / _versions_source when no
-        --path and no positional NAMEs) builds the inventory from piped names,
-        mirroring last-version's stdin path. Without this, available's non-path,
-        non-positional success branch was never exercised.
-        """
-        names = os.listdir(self.pycharm_dir)
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("\n".join(names) + "\n")):
-            exit_code, out, _ = run_cli(["available", "--pattern", "PyCharm(.*)", "--json"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(
-            json.loads(out),
-            {"2020.3": "PyCharm2020.3", "2021.1": "PyCharm2021.1", "2020.1": "PyCharm2020.1"},
-        )
-
-    def test_available_no_input(self):
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("")):
-            exit_code, out, err = run_cli(["available"])
-        self.assertEqual(exit_code, 2)
-        self.assertIn("no input given", err)
-
-    def test_last_version_with_path(self):
-        exit_code, out, _ = run_cli(["last-version", "--path", self.pycharm_dir, "--pattern", "PyCharm(.*)"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "PyCharm2021.1\n")
-
-    def test_last_version_from_stdin(self):
-        names = os.listdir(self.pycharm_dir)
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("\n".join(names) + "\n")):
-            exit_code, out, _ = run_cli(["last-version", "--pattern", "PyCharm(.*)"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "PyCharm2021.1\n")
-
-    def test_last_version_json_scalar_is_quoted_string(self):
-        """
-        last-version --json takes _print's scalar branch: the winning name is
-        serialized via json.dumps(), so it is a quoted JSON string
-        (``"PyCharm2021.1"``) rather than the bare plain-text line. This is the
-        only command whose scalar --json shape was previously untested.
-        """
-        exit_code, out, _ = run_cli(["last-version", "--path", self.pycharm_dir, "--pattern", "PyCharm(.*)", "--json"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, '"PyCharm2021.1"\n')
-        self.assertEqual(json.loads(out), "PyCharm2021.1")
-
-    def test_available_path_wins_over_positional_names(self):
-        """
-        When both --path and positional NAME(s) are given, _versions_source
-        gives --path priority: the inventory reflects the fixture directory's
-        contents, and the ignored positional name never appears in the result.
-        """
-        exit_code, out, _ = run_cli(["available", "--path", self.cellar_dir, "ignored-positional-9.9.9", "--json"])
-        self.assertEqual(exit_code, 0)
-        result = json.loads(out)
-        self.assertEqual(result, {"0.01": "0.01", "1.0": "1.0", "0.87": "0.87"})
-        self.assertNotIn("9.9.9", result)
-        self.assertNotIn("ignored-positional-9.9.9", result.values())
-
-    def test_last_version_path_wins_over_positional_names(self):
-        """
-        last-version applies the same --path-over-positional precedence: the
-        winner is drawn from the fixture directory, not the (numerically larger)
-        positional name that would otherwise win if it were considered.
-        """
-        exit_code, out, _ = run_cli(["last-version", "--path", self.cellar_dir, "ignored-positional-9.9.9"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "1.0\n")
-
     def test_available_filters_unparseable_names(self):
         """A mix of valid and unparseable names yields no blank-key row."""
         exit_code, out, _ = run_cli(["available", "1.0", "NoVersion", "PyCharm-2020.1.0", "--json"])
@@ -496,13 +329,6 @@ class TestCliDirectoryCommands(unittest.TestCase):
         self.assertEqual(exit_code, 1)
         self.assertEqual(out, "")
         self.assertIn("no version found in the given input", err)
-
-    def test_last_version_empty_stdin_friendly_error(self):
-        """Empty piped input reports no input (exit 2), never an uncaught error."""
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("")):
-            exit_code, out, err = run_cli(["last-version"])
-        self.assertEqual(exit_code, 2)
-        self.assertIn("no input given", err)
 
     def test_available_pattern_no_capture_group_friendly_error(self):
         """A capture-group-less pattern exits nonzero with a friendly stderr, not a traceback."""
@@ -558,186 +384,13 @@ class TestCliDirectoryCommands(unittest.TestCase):
         self.assertEqual(exit_code, 1)
         self.assertEqual(json.loads(out), {})
 
-    def test_available_with_path_mixed_valid_and_invalid(self):
-        """
-        The mixed/ fixture holds valid version dirs ("1.0", "2.0.0") alongside
-        unparseable ones ("NoVersion", "latest"); available --path keeps only the
-        valid entries, mirroring the library-level filtering test, and exits 0.
-        """
-        exit_code, out, _ = run_cli(["available", "--path", self.mixed_dir, "--json"])
-        self.assertEqual(exit_code, 0)
-        result = json.loads(out)
-        self.assertEqual(result, {"1.0": "1.0", "2.0.0": "2.0.0"})
-        self.assertNotIn("", result)
-
-    def test_last_version_with_path_mixed_valid_and_invalid(self):
-        """
-        last-version --path on the mixed/ fixture returns the newest valid entry
-        ("2.0.0"), ignoring the unparseable directory names entirely, exit 0.
-        """
-        exit_code, out, _ = run_cli(["last-version", "--path", self.mixed_dir])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "2.0.0\n")
-
-    def test_available_with_path_all_invalid_empty_inventory(self):
-        """
-        The all-invalid/ fixture yields an empty inventory via available --path:
-        empty JSON with exit 1, matching the all-unparseable list-input case.
-        """
-        exit_code, out, _ = run_cli(["available", "--path", self.all_invalid_dir, "--json"])
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(json.loads(out), {})
-
-    def test_available_with_path_all_invalid_plain_text_empty_stdout(self):
-        """
-        The all-invalid/ fixture yields an empty inventory in plain-text mode
-        (no --json): available --path exits 1 with EMPTY stdout, because the
-        plain-text mapping loop in _print simply never iterates over an empty
-        dict (the empty-inventory case was previously only covered via --json).
-        """
-        exit_code, out, _ = run_cli(["available", "--path", self.all_invalid_dir])
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(out, "")
-
-    def test_last_version_with_path_all_invalid_friendly_error(self):
-        """
-        last-version --path on the all-invalid/ fixture exits 1 with the friendly
-        stderr message and empty stdout, never an uncaught error.
-        """
-        exit_code, out, err = run_cli(["last-version", "--path", self.all_invalid_dir])
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(out, "")
-        self.assertIn("no version found in the given input", err)
-
-    def test_available_with_path_filtered_returns_original_dir_names(self):
-        """
-        The filtered/ fixture holds valid entries whose directory names differ
-        from their extracted version keys ("app-1.0" -> "1.0",
-        "app-2.0.0" -> "2.0.0"); available --path maps each version key to the
-        original directory name, and drops the unparseable entries.
-        """
-        exit_code, out, _ = run_cli(["available", "--path", self.filtered_dir, "--json"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(json.loads(out), {"1.0": "app-1.0", "2.0.0": "app-2.0.0"})
-
-    def test_last_version_with_path_filtered_returns_original_dir_name(self):
-        """
-        last-version --path on the filtered/ fixture returns the winning original
-        directory name ("app-2.0.0"), not the normalized version key ("2.0.0").
-        """
-        exit_code, out, _ = run_cli(["last-version", "--path", self.filtered_dir])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "app-2.0.0\n")
-
-    def test_available_with_path_duplicates(self):
-        """
-        The duplicates/ fixture holds "1.0" and "1.0.0", which normalize to the
-        same numeric key but stay distinct string keys in the inventory; both are
-        listed via available --path, exit 0.
-        """
-        exit_code, out, _ = run_cli(["available", "--path", self.duplicates_dir, "--json"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(json.loads(out), {"1.0": "1.0", "1.0.0": "1.0.0"})
-
-    def test_last_version_with_path_duplicates_deterministic_tie_break(self):
-        """
-        last-version --path on the duplicates/ fixture resolves the "1.0" vs
-        "1.0.0" tie (both pad to (1, 0, 0)) deterministically to "1.0.0" via the
-        string tie-break, mirroring the library-level cross-source stability test.
-        """
-        exit_code, out, _ = run_cli(["last-version", "--path", self.duplicates_dir])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "1.0.0\n")
-
-    def test_available_nonexistent_path_friendly_error(self):
-        """
-        A nonexistent --path raises FileNotFoundError from os.listdir(); the CLI
-        must catch it as an OSError and report a friendly stderr message with
-        exit 1, never a raw Python traceback.
-        """
-        exit_code, out, err = run_cli(["available", "--path", self.nonexistent_dir])
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(out, "")
-        self.assertIn("extract-version available:", err)
-        self.assertIn("no-such-directory-xyz", err)
-        self.assertNotIn("Traceback", err)
-
-    def test_available_path_not_a_directory_friendly_error(self):
-        """
-        A --path pointing at an existing file (not a directory) raises
-        NotADirectoryError from os.listdir(); the CLI reports it as a friendly
-        stderr message with exit 1, never a raw traceback.
-        """
-        exit_code, out, err = run_cli(["available", "--path", self.not_a_directory])
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(out, "")
-        self.assertIn("extract-version available:", err)
-        self.assertNotIn("Traceback", err)
-
-    def test_last_version_nonexistent_path_friendly_error(self):
-        """
-        A nonexistent --path raises FileNotFoundError from os.listdir(); the CLI
-        must catch it as an OSError and report a friendly stderr message with
-        exit 1, never a raw Python traceback.
-        """
-        exit_code, out, err = run_cli(["last-version", "--path", self.nonexistent_dir])
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(out, "")
-        self.assertIn("extract-version last-version:", err)
-        self.assertIn("no-such-directory-xyz", err)
-        self.assertNotIn("Traceback", err)
-
-    def test_last_version_path_not_a_directory_friendly_error(self):
-        """
-        A --path pointing at an existing file (not a directory) raises
-        NotADirectoryError from os.listdir(); the CLI reports it as a friendly
-        stderr message with exit 1, never a raw traceback.
-        """
-        exit_code, out, err = run_cli(["last-version", "--path", self.not_a_directory])
-        self.assertEqual(exit_code, 1)
-        self.assertEqual(out, "")
-        self.assertIn("extract-version last-version:", err)
-        self.assertNotIn("Traceback", err)
-
-
-class TestCliReadNames(unittest.TestCase):
-    """
-    Directly pin _read_names' stdin-parsing edge behavior, which the happy-path
-    stdin tests exercise only incidentally.
-    """
-
-    def test_stdin_strips_whitespace_and_drops_blank_lines(self):
-        """
-        _read_names strips surrounding whitespace from each piped line and drops
-        blank/whitespace-only lines, so ragged stdin (indented names, empty
-        lines, a trailing newline) still yields exactly the intended names in
-        order. Piped through `extract` end-to-end to assert the observable result.
-        """
-        piped = "  1.0  \n\n\t\nmy_program_v2.0\n   \n"
-        with mock.patch.object(cli.sys, "stdin", StdinPipe(piped)):
-            exit_code, out, _ = run_cli(["extract"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "1.0\n2.0\n")
-
-    def test_positional_names_take_precedence_over_piped_stdin(self):
-        """
-        When positional NAMEs are given, _read_names returns them and never
-        consults stdin, so piped content is ignored entirely (guards the
-        `if names:` early return against a regression that merged both sources).
-        """
-        with mock.patch.object(cli.sys, "stdin", StdinPipe("PyCharm-9.9.9\n")):
-            exit_code, out, _ = run_cli(["extract", "my_program_v1.0"])
-        self.assertEqual(exit_code, 0)
-        self.assertEqual(out, "1.0\n")
-
 
 class TestCliArgparseErrors(unittest.TestCase):
     """
-    argparse's own exit-2 path (unknown subcommand / missing required
-    subcommand) is distinct from the hand-rolled ``return 2`` no-input
-    branches: argparse raises ``SystemExit(2)`` from inside ``main`` rather
-    than returning a value, so ``run_cli`` never gets to return its tuple and
-    the exception must be caught around the call.
+    argparse's own exit-2 path (unknown subcommand / missing required subcommand) is
+    distinct from the hand-rolled ``return 2`` no-input branches: argparse raises
+    ``SystemExit(2)`` from inside ``main`` rather than returning a value, so ``run_cli``
+    never gets to return its tuple and the exception must be caught around the call.
     """
 
     def test_unknown_subcommand_exits_2(self):

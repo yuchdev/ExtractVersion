@@ -31,7 +31,7 @@ wrong application directory. The specific failure shapes your tests must pin dow
 So assert the **exact expected string or dict**, never just "truthy" or "did not raise", and
 cover the failure sentinel explicitly: these functions signal failure by returning `""`, so a
 test that only checks the happy path cannot tell "no version found" apart from "wrong version
-found". The existing `test/test_extract_version.py` pairs a `_valid` and an `_invalid` case
+found". The existing `tests/unit/test_version_info.py` pairs a `_valid` and an `_invalid` case
 for every function - keep that pairing for anything you add.
 
 ## Key Principles
